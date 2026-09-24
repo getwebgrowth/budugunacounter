@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Budu Guna Counter - Online Buddhist Tally Counter & Mala Clicker</title>
+  <meta name="description" content="Free online Budu Guna counter and tally counter for Buddhist chanting, Navaguna mala, and mantra recitations. Simple, distraction-free Single Zen mode and Advance multi-counter with local memory.">
+  <meta name="keywords" content="budu guna counter, buddhist tally counter, navaguna counter, online tasbih counter, tally counter, itipiso counter, mala beads clicker, digital prayer counter, buddhist chant counter, free online tally counter">
+  <meta name="theme-color" content="#0d0a02">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFD631'%3E%3Ccircle cx='12' cy='12' r='10' fill='%230d0a02' stroke='%23FFD631' stroke-width='2'/%3E%3Cpath d='M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8z'/%3E%3C/svg%3E">
+  
+  <!-- Open Graph / SEO -->
+  <meta property="og:title" content="Budu Guna Counter - Online Buddhist Tally Counter & Mala Clicker">
+  <meta property="og:description" content="Tranquil, high-precision tally counter for Buddhist Budu Guna and mantra chanting. Zen single mode, multi-counter, audio haptics, and 108 mala tracking.">
+  <meta property="og:type" content="website">
+  
+  <!-- Structured Data JSON-LD (SEO, GEO & AEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://budugunacounter.com/#app",
+        "name": "Budu Guna Counter - Online Buddhist Tally Counter",
+        "url": "https://budugunacounter.com",
+        "applicationCategory": "HealthApplication, UtilitiesApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "A free, tranquil online tally counter designed for Buddhist Budu Guna, Navaguna, and mantra chanting. Features single zen mode, multi-counter, audio haptics, and 108 mala tracking.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://budugunacounter.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a Budu Guna Counter?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A Budu Guna Counter is a dedicated Buddhist digital tally counter designed to track repetitions of the Nine Supreme Virtues of the Buddha (Nava Arahadi Budu Guna / Itipi So Bhagava) and other protective Buddhist parittas and mantras."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the 9 Virtues of the Buddha (Navaguna)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The 9 Budu Guna are: 1. Araham (The Worthy One), 2. Samma-Sambuddho (Fully Self-Enlightened), 3. Vijja-Carana-Sampanno (Endowed with Wisdom & Moral Conduct), 4. Sugato (The Well-Gone One), 5. Lokavidu (Knower of the Worlds), 6. Anuttaro Purisa-Damma-Sarathi (Incomparable Guide of Beings), 7. Sattha Deva-Manussanam (Teacher of Gods and Humans), 8. Buddho (The Awakened One), and 9. Bhagava (The Blessed Lord)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do Buddhist chanters count to 108?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In Buddhist tradition, a complete mala rosary has 108 beads, representing the elimination of 108 earthly defilements (kilesas) across past, present, and future sensory experiences."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does this tally counter work offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. This online tally counter stores all your counts directly in your browser's local memory (localStorage). It requires no internet after loading and features one-click backup export."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-gold">
+  <div id="app" class="app-container">
+
+    <!-- Top Header Bar -->
+    <header class="app-header" id="appHeader">
+      <div class="header-left">
+        <!-- Single Mode Controls -->
+        <div class="single-mode-header-group single-mode-only">
+          <button id="btnGoalTrigger" class="header-btn goal-trigger" aria-haspopup="dialog" aria-expanded="false" title="Set Chanting Goal">
+            <svg class="header-icon mala-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="4" r="1.8" fill="currentColor"/>
+              <circle cx="17.5" cy="6.5" r="1.8" fill="currentColor"/>
+              <circle cx="20" cy="12" r="1.8" fill="currentColor"/>
+              <circle cx="17.5" cy="17.5" r="1.8" fill="currentColor"/>
+              <circle cx="12" cy="20" r="1.8" fill="currentColor"/>
+              <circle cx="6.5" cy="17.5" r="1.8" fill="currentColor"/>
+              <circle cx="4" cy="12" r="1.8" fill="currentColor"/>
+              <circle cx="6.5" cy="6.5" r="1.8" fill="currentColor"/>
+              <path d="M12 2v2" stroke-linecap="round"/>
+            </svg>
+            <span id="goalLabel" class="btn-text"><span class="goal-prefix">Goal: </span><span id="headerGoalVal">108</span></span>
+          </button>
+        </div>
+
+        <!-- Advance / Multi Mode Controls -->
+        <div class="multi-mode-header-group multi-mode-only hidden">
+          <button id="btnToggleSingle" class="header-btn zen-pill-btn" title="Return to Single Zen Counter">
+            <svg class="header-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+            </svg>
+            <span>Single Zen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Header Right -->
+      <div class="header-right">
+        <!-- Advance Toggle (Single Mode Only) -->
+        <button id="btnToggleAdvance" class="header-btn advance-pill-btn single-mode-only" title="Switch to Advance Multi-Counters">
+          <svg class="header-icon" viewBox="0 0 20 20" fill="currentColor">
+            <rect x="3" y="3" width="5" height="5" rx="1"/>
+            <rect x="12" y="3" width="5" height="5" rx="1"/>
+            <rect x="3" y="12" width="5" height="5" rx="1"/>
+            <rect x="12" y="12" width="5" height="5" rx="1"/>
+          </svg>
+          <span>Advance</span>
+        </button>
+
+        <!-- New Counter Button (Multi Mode Only) -->
+        <button id="btnAddNewCounterHeader" class="header-btn new-counter-header-btn multi-mode-only hidden" title="Add New Counter">
+          <svg class="header-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>New</span>
+        </button>
+
+        <!-- Reset Button (Single Mode Only) -->
+        <button id="btnResetCounter" class="header-icon-btn reset-icon-btn single-mode-only" title="Reset counter to zero" aria-label="Reset Count">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+
+        <!-- Settings Drawer Toggle -->
+        <button id="btnInfoToggle" class="header-icon-btn" title="Settings &amp; Themes" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW AREA -->
+    <main class="main-content">
+
+      <!-- ================= SINGLE COUNTER VIEW (Tasbih.org Zen Mode) ================= -->
+      <section id="viewSingle" class="view-single active">
+
+        <!-- Central Display Number Box -->
+        <div class="counter-display-wrap">
+          <!-- Chant Title Pill (Unified directly above the count) -->
+          <div class="chant-name-group">
+            <button id="btnActiveChantName" class="active-chant-title-btn" title="Click to rename this chant">
+              <span id="activeChantTitle">1. Araham</span>
+              <svg class="edit-tiny-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+            </button>
+          </div>
+
+          <div class="chant-badge-area">
+            <span id="singleChantPali" class="chant-pali-text">අරහං • The Worthy One</span>
+            <span id="singleGoalLapBadge" class="goal-lap-badge hidden">Lap <span id="lapNumber">1</span></span>
+          </div>
+          
+          <div class="counter-number-box">
+            <label for="counterDirectInput" class="sr-only">Direct count input</label>
+            <input type="text" id="counterDirectInput" name="direct_count" class="counter-direct-input hidden" inputmode="numeric" pattern="[0-9]*" aria-label="Direct count input">
+            <div id="counterValueDisplay" class="counter-value-display" title="Click or tap to edit value">0</div>
+          </div>
+
+          <div class="counter-meta-sub">
+            <span id="counterGoalProgressText" class="goal-progress-text">Goal: 0 / 108</span>
+          </div>
+        </div>
+
+        <!-- Giant Central Increment Button with SVG Goal Ring -->
+        <div class="incrementor-zone">
+          <button id="btnIncrement" class="increment-btn" aria-label="Count Up">
+            <div class="btn-ripple-container"></div>
+            
+            <!-- Circular Goal Progress Ring -->
+            <svg class="goal-progress-svg" viewBox="0 0 100 100">
+              <circle class="goal-track-bg" cx="50" cy="50" r="47"/>
+              <circle id="goalTrackProgress" class="goal-track-progress" cx="50" cy="50" r="47" stroke-dasharray="295.3" stroke-dashoffset="295.3"/>
+            </svg>
+
+            <!-- Inner Visual Button -->
+            <div class="increment-inner-btn">
+              <svg class="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <!-- Single Mode Bottom Controls -->
+        <div class="single-bottom-controls">
+          <!-- Discreet Decrement Button (No highlight / low priority) -->
+          <button id="btnDecrement" class="decrementor-btn" title="Minus Count" aria-label="Decrement count">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <!-- Center Footer Hint (Clean and peaceful) -->
+          <div class="footer-hint">
+            <svg class="hint-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2zm0 2v8h16V8H4zm4 6h8v-2H8v2z"/>
+            </svg>
+            <span class="hint-text">Press Spacebar or Tap</span>
+          </div>
+
+          <!-- Blind Mode Eye Toggle -->
+          <button id="btnBlindModeToggle" class="blind-mode-btn" title="Blind Chanting Mode (Screen tap anywhere)" aria-label="Blind Mode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= MULTI COUNTER VIEW (Advance / Tallycount.app Mode) ================= -->
+      <section id="viewMulti" class="view-multi hidden">
+        <!-- Multi Counter Top Controls Bar -->
+        <div class="multi-controls-bar">
+          <div class="multi-stats-summary">
+            <div class="stat-pill">
+              <span class="stat-label">Total Chants:</span>
+              <span id="multiTotalChants" class="stat-value">0</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Counters:</span>
+              <span id="multiTotalCountersCount" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <div class="multi-actions-group">
+            <button id="btnLoadBuduGunaPreset" class="action-btn-secondary" title="Populate 9 Supreme Budu Guna (Navaguna)">
+              <svg viewBox="0 0 20 20" fill="currentColor" class="btn-svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/></svg>
+              <span>Load 9 Budu Guna</span>
+            </button>
+            <button id="btnAddNewCounter" class="action-btn-primary" title="Add a custom new counter">
+              <svg viewBox="0 0 20 20" fill="currentColor" class="btn-svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+              <span>New Counter</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Multi Counters Grid -->
+        <div id="multiCountersGrid" class="multi-counters-grid">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </section>
+
+      <!-- ================= COMPREHENSIVE SEO / GEO / AEO ARTICLE SECTION ================= -->
+      <section id="seoArticleSection" class="seo-article-section" aria-label="Budu Guna & Tally Counter Guide">
+        <article class="seo-article-card">
+          <header class="seo-article-header">
+            <span class="seo-tag">Buddhism &amp; Mindfulness Tools</span>
+            <h1 class="seo-main-title">Online Budu Guna Tally Counter: The Sacred 9 Virtues &amp; Mala Beads Clicker</h1>
+            <p class="seo-lead">
+              Welcome to the free online <strong>Budu Guna Counter</strong> and <strong>tally counter</strong> — a clean, distraction-free digital chanting tool tailored specifically for Buddhist practitioners, monks, and meditators. Designed with the zen minimalism of tasbih-style clickers and the versatile multi-counter power of modern tally apps, this tool remembers your counts locally with zero complexity.
+            </p>
+          </header>
+
+          <div class="seo-body-content">
+            <section class="seo-subsection">
+              <h2>What is a Budu Guna Counter?</h2>
+              <p>
+                A <strong>Budu Guna Counter</strong> (also known as a <em>Navaguna clicker</em> or <em>Itipi So counter</em>) is a dedicated counting tool used to tally recitations of the <strong>Nine Supreme Virtues of the Buddha</strong> (නව අරහාදී බුදු ගුණ). In Theravada Buddhist tradition across Sri Lanka, Thailand, Myanmar, and worldwide, chanting these nine attributes cultivates supreme mental tranquility, deep mindfulness (<em>Buddhānussati</em>), spiritual protection (<em>Paritta</em>), and immense merit.
+              </p>
+              <p>
+                Traditional chanters use physical 108-bead wooden or bodhi seed malas. This online tally counter replicates the sacred rhythm of physical mala beads directly on your smartphone, tablet, or desktop with <strong>offline local memory</strong> and tactile feedback.
+              </p>
+            </section>
+
+            <section class="seo-subsection">
+              <h2>The Nine Supreme Virtues of the Buddha (Navaguna - නව අරහාදී බුදු ගුණ)</h2>
+              <p>
+                The <em>Itipi So Bhagavā</em> gāthā encapsulates the nine transcendent qualities realized by Gautama Buddha. You can track each virtue individually in our <strong>Advance Multi-Counter</strong> mode or chant them as a complete 108 mala cycle in <strong>Single Zen</strong> mode:
+              </p>
+
+              <div class="seo-guna-grid">
+                <div class="seo-guna-card">
+                  <span class="guna-num">01</span>
+                  <h3>Araham (අරහං)</h3>
+                  <p class="guna-trans">The Worthy One</p>
+                  <p class="guna-desc">Totally freed from all mental defilements (kilesas), worthy of supreme homage and offerings by deities and humankind.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">02</span>
+                  <h3>Sammā-Sambuddho (සම්මා සම්බුද්ධෝ)</h3>
+                  <p class="guna-trans">Fully Self-Enlightened</p>
+                  <p class="guna-desc">Possessing direct, unassisted realization of the Four Noble Truths and the true nature of reality without any teacher.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">03</span>
+                  <h3>Vijjā-Caraṇa-Sampanno (විජ්ජාචරණ සම්පන්නෝ)</h3>
+                  <p class="guna-trans">Endowed with Wisdom &amp; Virtue</p>
+                  <p class="guna-desc">Equipped with the threefold/eightfold higher spiritual knowledge (vijjā) and flawless ethical conduct (caraṇa).</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">04</span>
+                  <h3>Sugato (සුගතෝ)</h3>
+                  <p class="guna-trans">The Well-Gone One</p>
+                  <p class="guna-desc">Traveled the Noble Eightfold Path gracefully and reached the unshakeable bliss of Nibbāna; speaker of only beneficial truth.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">05</span>
+                  <h3>Lokavidū (ලෝකවිදූ)</h3>
+                  <p class="guna-trans">Knower of the Worlds</p>
+                  <p class="guna-desc">Comprehends the nature, origin, and cessation of all realms of sentient beings, the inanimate universe, and the mental world.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">06</span>
+                  <h3>Anuttaro Purisa-Damma-Sārathi (අනුත්තරෝ පුරිසදම්මසාරථී)</h3>
+                  <p class="guna-trans">Incomparable Leader of Beings</p>
+                  <p class="guna-desc">The unmatched spiritual trainer capable of taming fierce beings, kings, and celestial spirits with boundless compassion and skillful means.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">07</span>
+                  <h3>Satthā Deva-Manussānam (සත්ථා දේවමනුස්සානං)</h3>
+                  <p class="guna-trans">Teacher of Gods &amp; Humans</p>
+                  <p class="guna-desc">The supreme teacher who guides gods, devas, and human beings across the ocean of suffering to eternal peace.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">08</span>
+                  <h3>Buddho (බුද්ධෝ)</h3>
+                  <p class="guna-trans">The Awakened One</p>
+                  <p class="guna-desc">Fully awakened from the deep slumber of ignorance, who awakens other sentient beings to liberating Dhamma.</p>
+                </div>
+
+                <div class="seo-guna-card">
+                  <span class="guna-num">09</span>
+                  <h3>Bhagavā (භගවා)</h3>
+                  <p class="guna-trans">The Blessed Lord</p>
+                  <p class="guna-desc">Possessing glorious spiritual accomplishments, merits, and the supreme capacity to analyze and teach the Dhamma.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="seo-subsection">
+              <h2>Why 108 Beads? The Meaning Behind Buddhist Mala Counts</h2>
+              <p>
+                A standard Buddhist counting rosary (<em>japa mala</em>) contains <strong>108 beads</strong>. In Buddhist numerology and psychology:
+              </p>
+              <ul class="seo-bullet-list">
+                <li><strong>6 Senses:</strong> Sight, sound, smell, taste, touch, and consciousness.</li>
+                <li><strong>3 Feelings:</strong> Pleasant, unpleasant, and neutral (6 × 3 = 18).</li>
+                <li><strong>2 Origins:</strong> Arising internally or externally (18 × 2 = 36).</li>
+                <li><strong>3 Times:</strong> Past, present, and future (36 × 3 = <strong>108 defilements / kilesas</strong>).</li>
+              </ul>
+              <p>
+                By reciting a sacred gāthā or virtue 108 times, the chanter purifies these 108 potential mental hindrances. Our tool features built-in milestone tracking for 108 repetitions, with automatic <strong>Lap counters</strong> (Lap 1, Lap 2, Lap 3...) as you progress through thousands of chants.
+              </p>
+            </section>
+
+            <section class="seo-subsection">
+              <h2>Key Advantages of This Online Tally Counter</h2>
+              <div class="seo-features-comparison">
+                <div class="comp-col">
+                  <h3>Single Zen Mode (Tasbih Style)</h3>
+                  <ul>
+                    <li>100% full-screen distraction-free interface.</li>
+                    <li>Giant circular increment button with smooth SVG goal track.</li>
+                    <li>Tabular typography preventing digit jumps.</li>
+                    <li>Blind Chanting Mode: tap anywhere on the screen with eyes closed.</li>
+                  </ul>
+                </div>
+                <div class="comp-col">
+                  <h3>Advance Mode (Multi-Counter)</h3>
+                  <ul>
+                    <li>Track all 9 Budu Guna side-by-side on individual cards.</li>
+                    <li>One-click "Load 9 Budu Guna" template.</li>
+                    <li>Aggregate total chants counter across all active practices.</li>
+                    <li>"Focus" button to zoom any chant into the Single Zen view.</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="seo-subsection">
+              <h2>Frequently Asked Questions (FAQ)</h2>
+              <div class="seo-faq-list">
+                <div class="seo-faq-item">
+                  <h3>How does the counter remember my tallies?</h3>
+                  <p>All counts, custom goals, and step increments are automatically saved to your browser's local memory (localStorage). Your data remains safe even if you refresh or close your browser.</p>
+                </div>
+                <div class="seo-faq-item">
+                  <h3>Can I export and back up my chant counts?</h3>
+                  <p>Yes. Open the Settings drawer (top right icon) and click <strong>"Export Data (JSON)"</strong>. You can save your file to your phone or computer, or restore it on any device via <strong>"Import Backup"</strong>.</p>
+                </div>
+                <div class="seo-faq-item">
+                  <h3>How do I use keyboard shortcuts on desktop?</h3>
+                  <p>Press <kbd>Spacebar</kbd> or <kbd>&uarr;</kbd> to increment count, <kbd>&darr;</kbd> to decrement, <kbd>R</kbd> to reset, <kbd>M</kbd> to toggle between Single and Advance mode, and <kbd>B</kbd> for Blind Mode.</p>
+                </div>
+                <div class="seo-faq-item">
+                  <h3>What is Blind Mode?</h3>
+                  <p>Blind Mode dims all icons and buttons, turning your phone or desktop screen into a single seamless tap surface. This allows you to close your eyes, focus on breath and contemplation, and tap anywhere to count.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <footer class="seo-article-footer">
+            <p>&copy; 2026 Budu Guna Counter. Free, privacy-first Buddhist tally counter for mindfulness and Dhamma chanting.</p>
+          </footer>
+        </article>
+      </section>
+
+    </main>
+
+    <!-- ================= MODALS & DRAWERS ================= -->
+
+    <!-- Goal Setting Modal -->
+    <div id="modalGoal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Set Chanting Goal</h3>
+          <button class="modal-close-btn" data-close="modalGoal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Select a Buddhist mala bead count or set a custom target:</p>
+          <div class="preset-chips-grid">
+            <button class="preset-chip" data-goal="9">9 (Navaguna)</button>
+            <button class="preset-chip" data-goal="21">21</button>
+            <button class="preset-chip" data-goal="27">27 (1/4 Mala)</button>
+            <button class="preset-chip" data-goal="54">54 (1/2 Mala)</button>
+            <button class="preset-chip" data-goal="108">108 (Full Mala)</button>
+            <button class="preset-chip" data-goal="500">500</button>
+            <button class="preset-chip" data-goal="1000">1,000</button>
+            <button class="preset-chip" data-goal="10000">10,000</button>
+            <button class="preset-chip preset-chip-none" data-goal="0">No Goal (Free Count)</button>
+          </div>
+
+          <div class="custom-input-group">
+            <label for="inputCustomGoal">Custom Goal Number:</label>
+            <div class="input-with-action">
+              <input type="number" id="inputCustomGoal" placeholder="e.g. 108" min="1" max="9999999">
+              <button id="btnApplyCustomGoal" class="btn-confirm">Set</button>
+            </div>
+          </div>
+
+          <div class="custom-input-group" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-border);">
+            <label>Increment Step Size (Click Increment):</label>
+            <div class="preset-chips-grid step-chips-in-goal" style="margin-top: 8px;">
+              <button type="button" class="preset-chip step-chip-quick" data-step="1">+1 (Standard)</button>
+              <button type="button" class="preset-chip step-chip-quick" data-step="2">+2</button>
+              <button type="button" class="preset-chip step-chip-quick" data-step="3">+3</button>
+              <button type="button" class="preset-chip step-chip-quick" data-step="5">+5</button>
+              <button type="button" class="preset-chip step-chip-quick" data-step="9">+9 (Navaguna)</button>
+              <button type="button" class="preset-chip step-chip-quick" data-step="10">+10</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Increment Modal -->
+    <div id="modalStep" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Increment Step</h3>
+          <button class="modal-close-btn" data-close="modalStep" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">How many chants to add with each click:</p>
+          <div class="preset-chips-grid">
+            <button class="preset-chip" data-step="1">+1 (Standard)</button>
+            <button class="preset-chip" data-step="2">+2</button>
+            <button class="preset-chip" data-step="3">+3 (Triple Gem)</button>
+            <button class="preset-chip" data-step="5">+5</button>
+            <button class="preset-chip" data-step="9">+9 (9 Budu Guna)</button>
+            <button class="preset-chip" data-step="10">+10</button>
+            <button class="preset-chip" data-step="21">+21</button>
+            <button class="preset-chip" data-step="108">+108 (Full Mala)</button>
+          </div>
+
+          <div class="custom-input-group">
+            <label for="inputCustomStep">Custom Step Value:</label>
+            <div class="input-with-action">
+              <input type="number" id="inputCustomStep" placeholder="e.g. 7" min="1" max="10000">
+              <button id="btnApplyCustomStep" class="btn-confirm">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct Edit Modal -->
+    <div id="modalEdit" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Edit Count Value</h3>
+          <button class="modal-close-btn" data-close="modalEdit" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Manually adjust your tally count for <strong id="editModalChantName">this counter</strong>:</p>
+          <div class="custom-input-group">
+            <label for="inputEditCurrentValue" class="sr-only">Count Value:</label>
+            <input type="number" id="inputEditCurrentValue" name="edit_current_value" placeholder="0" min="0" max="999999999" aria-label="Adjust count value">
+          </div>
+          <div class="modal-footer-actions">
+            <button id="btnSaveDirectValue" class="btn-primary-action">Save Count</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings & Buddhist Chants Info Drawer -->
+    <div id="drawerSettings" class="drawer-backdrop hidden">
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <div class="drawer-title-group">
+            <svg class="dharma-wheel-icon" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8z"/>
+              <line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <h2>Settings</h2>
+          </div>
+          <button class="drawer-close-btn" id="btnCloseDrawer" aria-label="Close Drawer">&times;</button>
+        </div>
+
+        <div class="drawer-content">
+          <!-- Color Theme Selector -->
+          <div class="settings-section">
+            <h4 class="section-title">Color Palette Theme</h4>
+            <p class="section-subtitle">Buddhist palette colors with serene dark background (Default: Bodhi Golden Yellow):</p>
+            <div class="color-palette-picker">
+              <button class="palette-swatch active" data-theme="gold" title="Bodhi Golden Yellow (#FFD631)" style="--swatch-color: #FFD631;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Golden</span>
+              </button>
+              <button class="palette-swatch" data-theme="tasbih" title="Tasbih Emerald (#06fd91)" style="--swatch-color: #06fd91;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Emerald</span>
+              </button>
+              <button class="palette-swatch" data-theme="saffron" title="Saffron Orange (#FF7C20)" style="--swatch-color: #FF7C20;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Saffron</span>
+              </button>
+              <button class="palette-swatch" data-theme="ruby" title="Lotus Ruby Crimson (#B31840)" style="--swatch-color: #B31840;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Ruby</span>
+              </button>
+              <button class="palette-swatch" data-theme="magenta" title="Lotus Magenta (#E63085)" style="--swatch-color: #E63085;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Magenta</span>
+              </button>
+              <button class="palette-swatch" data-theme="blue" title="Dharma Sapphire Blue (#1860A0)" style="--swatch-color: #1860A0;">
+                <span class="swatch-check">✓</span>
+                <span class="swatch-label">Sapphire</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Audio & Feedback -->
+          <div class="settings-section">
+            <h4 class="section-title">Audio &amp; Meditation Sensory</h4>
+            <div class="setting-toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-name">Mala Bead Click Sound</span>
+                <span class="toggle-desc">Acoustic wooden mala bead click on each chant (Default: Off)</span>
+              </div>
+              <label class="switch" for="checkSoundEnabled">
+                <input type="checkbox" id="checkSoundEnabled" aria-label="Enable mala bead click sound">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-name">Goal Bell Chime</span>
+                <span class="toggle-desc">Singing bowl bell chime when completing 108 or custom goal</span>
+              </div>
+              <label class="switch" for="checkBellEnabled">
+                <input type="checkbox" id="checkBellEnabled" aria-label="Enable goal singing bowl chime">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-name">Haptic Vibration</span>
+                <span class="toggle-desc">Tactile vibration feedback on phone screens</span>
+              </div>
+              <label class="switch" for="checkHapticEnabled">
+                <input type="checkbox" id="checkHapticEnabled" aria-label="Enable haptic vibration" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Navaguna / 9 Budu Guna Reference Guide -->
+          <div class="settings-section">
+            <h4 class="section-title">The Nine Supreme Virtues of Buddha (නව අරහාදී බුදු ගුණ)</h4>
+            <p class="section-subtitle">Chanted for protection, peace of mind, and accumulating merit:</p>
+            <div class="guna-accordion-list">
+              <div class="guna-item">
+                <div class="guna-head"><strong>1. Araham (අරහං)</strong> - The Worthy One</div>
+                <div class="guna-body">Free from all defilements, worthy of deepest reverence by gods and humans.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>2. Sammā-Sambuddho (සම්මා සම්බුද්ධෝ)</strong> - Fully Self-Enlightened</div>
+                <div class="guna-body">Possesses perfect direct comprehension of the Four Noble Truths without any teacher.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>3. Vijjā-Carana-Sampanno (විජ්ජාචරණ සම්පන්නෝ)</strong> - Endowed with Wisdom &amp; Virtue</div>
+                <div class="guna-body">Possessing supreme higher knowledge and immaculate moral conduct.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>4. Sugato (සුගතෝ)</strong> - The Well-Gone One</div>
+                <div class="guna-body">Walked the sublime Noble Eightfold Path directly to complete liberation in Nibbana.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>5. Lokavidū (ලෝකවිදූ)</strong> - Knower of the Worlds</div>
+                <div class="guna-body">Understands the origin, nature, and cessation of all realms of existence.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>6. Anuttaro Purisa-Damma-Sārathi (අනුත්තරෝ පුරිසදම්මසාරථී)</strong> - Incomparable Leader</div>
+                <div class="guna-body">Supreme guide of beings capable of spiritual training and enlightenment.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>7. Satthā Deva-Manussānam (සත්ථා දේවමනුස්සානං)</strong> - Teacher of Gods &amp; Humans</div>
+                <div class="guna-body">Guide for all sentient beings seeking refuge from the cycle of samsara.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>8. Buddho (බුද්ධෝ)</strong> - The Awakened One</div>
+                <div class="guna-body">Awakened to the ultimate truth and awakens others from ignorance.</div>
+              </div>
+              <div class="guna-item">
+                <div class="guna-head"><strong>9. Bhagavā (භගවා)</strong> - The Blessed Lord</div>
+                <div class="guna-body">Endowed with infinite spiritual merits and supreme analytical exposition.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Backup & Restore -->
+          <div class="settings-section">
+            <h4 class="section-title">Data Backup (Offline Local Storage)</h4>
+            <p class="section-subtitle">Your tallies are saved in your device's browser memory. Export anytime so your chant counts are never lost:</p>
+            <div class="backup-actions">
+              <button id="btnExportData" class="btn-outline">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="btn-svg"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                <span>Export Data (JSON)</span>
+              </button>
+              <label class="btn-outline file-upload-btn">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="btn-svg"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+                <span>Import Backup</span>
+                <input type="file" id="fileImportBackup" accept=".json" class="hidden" aria-label="Import JSON Backup">
+              </label>
+            </div>
+          </div>
+
+          <!-- Shortcuts -->
+          <div class="settings-section">
+            <h4 class="section-title">Keyboard Shortcuts</h4>
+            <div class="shortcuts-table">
+              <div class="shortcut-row"><kbd>Space</kbd> or <kbd>&uarr;</kbd> <span>Count +1</span></div>
+              <div class="shortcut-row"><kbd>&darr;</kbd> or <kbd>-</kbd> <span>Count -1</span></div>
+              <div class="shortcut-row"><kbd>R</kbd> <span>Reset current counter</span></div>
+              <div class="shortcut-row"><kbd>M</kbd> <span>Toggle Single / Multi Mode</span></div>
+              <div class="shortcut-row"><kbd>B</kbd> <span>Toggle Blind Screen Mode</span></div>
+              <div class="shortcut-row"><kbd>Esc</kbd> <span>Close active modal</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Blind Mode Fullscreen Overlay -->
+    <div id="blindModeOverlay" class="blind-mode-overlay hidden" aria-hidden="true">
+      <div class="blind-mode-content">
+        <div id="blindCounterDisplay" class="blind-counter-digits">0</div>
+        <div class="blind-hint">Tap anywhere on screen to count</div>
+      </div>
+      <button id="btnExitBlindMode" class="btn-exit-blind" aria-label="Exit Blind Mode">
+        <svg viewBox="0 0 20 20" fill="currentColor" class="exit-blind-icon"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        <span>Exit Blind Mode</span>
+      </button>
+    </div>
+
+    <!-- New Counter / Edit Counter Modal -->
+    <div id="modalNewCounter" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="newCounterModalTitle" class="modal-title">Add New Counter</h3>
+          <button class="modal-close-btn" data-close="modalNewCounter" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="custom-input-group">
+            <label for="inputNewCounterName">Chant or Counter Name:</label>
+            <input type="text" id="inputNewCounterName" placeholder="e.g. Karaniya Metta Sutta, Itipiso, etc.">
+          </div>
+          <div class="custom-input-group">
+            <label for="inputNewCounterPali">Sub-label or Pali/Sinhala text (optional):</label>
+            <input type="text" id="inputNewCounterPali" placeholder="e.g. කරණීයමෙත්ත සූත්‍රය / 108 Repetitions">
+          </div>
+          <div class="input-grid-two">
+            <div class="custom-input-group">
+              <label for="inputNewCounterGoal">Goal (optional):</label>
+              <input type="number" id="inputNewCounterGoal" placeholder="108" min="0" value="108">
+            </div>
+            <div class="custom-input-group">
+              <label for="inputNewCounterStep">Step (+):</label>
+              <input type="number" id="inputNewCounterStep" placeholder="1" min="1" value="1">
+            </div>
+          </div>
+          <div class="modal-footer-actions">
+            <button id="btnSaveNewCounter" class="btn-primary-action">Create Counter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastMessage" class="toast-message hidden" role="alert"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
