@@ -95,6 +95,10 @@
 <body class="theme-gold">
   <div id="app" class="app-container">
 
+    <!-- Ambient Buddha Wallpaper & Vignette Layers -->
+    <div class="buddha-bg-layer" id="buddhaBgLayer" aria-hidden="true"></div>
+    <div class="buddha-vignette-overlay" aria-hidden="true"></div>
+
     <!-- Top Header Bar -->
     <header class="app-header" id="appHeader">
       <div class="header-left">
@@ -172,8 +176,18 @@
       <!-- ================= SINGLE COUNTER VIEW (Tasbih.org Zen Mode) ================= -->
       <section id="viewSingle" class="view-single active">
 
-        <!-- Central Display Number Box -->
-        <div class="counter-display-wrap">
+        <!-- Central Display Number Box (Widget Tile 1) -->
+        <div id="tileCounterCard" class="counter-display-wrap widget-tile" data-tile="counter">
+          <!-- Tile Edit Handle (visible during layout customization) -->
+          <div class="tile-edit-handle">
+            <span class="handle-grip"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg> Drag Card</span>
+            <div class="tile-size-stepper">
+              <button type="button" class="btn-step-size btn-size-minus" data-tile="counter" title="Make smaller" aria-label="Decrease counter card size">−</button>
+              <span id="counterTileSizeVal" class="size-val">100%</span>
+              <button type="button" class="btn-step-size btn-size-plus" data-tile="counter" title="Make larger" aria-label="Increase counter card size">+</button>
+            </div>
+          </div>
+
           <!-- Chant Title Pill (Unified directly above the count) -->
           <div class="chant-name-group">
             <button id="btnActiveChantName" class="active-chant-title-btn" title="Click to rename this chant">
@@ -198,8 +212,18 @@
           </div>
         </div>
 
-        <!-- Giant Central Increment Button with SVG Goal Ring -->
-        <div class="incrementor-zone">
+        <!-- Giant Central Increment Button with SVG Goal Ring (Widget Tile 2) -->
+        <div id="tileIncrementor" class="incrementor-zone widget-tile" data-tile="plus">
+          <!-- Tile Edit Handle (visible during layout customization) -->
+          <div class="tile-edit-handle">
+            <span class="handle-grip"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg> Drag Button</span>
+            <div class="tile-size-stepper">
+              <button type="button" class="btn-step-size btn-size-minus" data-tile="plus" title="Make smaller" aria-label="Decrease plus button size">−</button>
+              <span id="plusTileSizeVal" class="size-val">100%</span>
+              <button type="button" class="btn-step-size btn-size-plus" data-tile="plus" title="Make larger" aria-label="Increase plus button size">+</button>
+            </div>
+          </div>
+
           <button id="btnIncrement" class="increment-btn" aria-label="Count Up">
             <div class="btn-ripple-container"></div>
             
@@ -228,21 +252,64 @@
             </svg>
           </button>
 
-          <!-- Center Footer Hint (Clean and peaceful) -->
-          <div class="footer-hint">
-            <svg class="hint-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2zm0 2v8h16V8H4zm4 6h8v-2H8v2z"/>
-            </svg>
-            <span class="hint-text">Press Spacebar or Tap</span>
+          <!-- Center Controls Group: Hint + Move Tiles Trigger -->
+          <div class="bottom-center-actions">
+            <!-- Center Footer Hint (Clean and peaceful) -->
+            <div class="footer-hint">
+              <svg class="hint-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2zm0 2v8h16V8H4zm4 6h8v-2H8v2z"/>
+              </svg>
+              <span class="hint-text">Press Spacebar or Tap</span>
+            </div>
+
+            <!-- Move / Customize Tiles Button (Hidden on primary screen once saved; accessible in Advanced Settings) -->
+            <button id="btnToggleCustomizeTiles" class="customize-tiles-trigger-btn hidden" title="Move & resize counter tiles on screen" aria-label="Customize Tile Positions">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="5 9 2 12 5 15"></polyline>
+                <polyline points="9 5 12 2 15 5"></polyline>
+                <polyline points="15 19 12 22 9 19"></polyline>
+                <polyline points="19 9 22 12 19 15"></polyline>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <line x1="12" y1="2" x2="12" y2="22"></line>
+              </svg>
+              <span class="tiles-btn-text">Move Tiles</span>
+            </button>
           </div>
 
           <!-- Blind Mode Eye Toggle -->
           <button id="btnBlindModeToggle" class="blind-mode-btn" title="Blind Chanting Mode (Screen tap anywhere)" aria-label="Blind Mode">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
+            <span class="blind-mode-btn-text">Blind Mode</span>
           </button>
+        </div>
+
+        <!-- Floating Tiles Customization Toolbar (active when editing layout) -->
+        <div id="tilesCustomizeToolbar" class="tiles-customize-toolbar hidden" aria-live="polite">
+          <div class="tiles-toolbar-inner">
+            <div class="tiles-toolbar-info">
+              <span class="toolbar-title">✥ Move &amp; Resize Tiles</span>
+              <span class="toolbar-sub">Drag tiles to place • Tap − / + to scale</span>
+            </div>
+            <div class="tiles-toolbar-presets">
+              <button type="button" class="toolbar-preset-btn" data-preset="default" title="Reset to standard center">Center</button>
+              <button type="button" class="toolbar-preset-btn" data-preset="buddha-gaze" title="Clear center to gaze at Buddha statue">Buddha Gaze</button>
+              <button type="button" class="toolbar-preset-btn" data-preset="right-thumb" title="Place plus button in right corner">Right Hand</button>
+              <button type="button" class="toolbar-preset-btn" data-preset="left-thumb" title="Place plus button in left corner">Left Hand</button>
+            </div>
+            <div class="tiles-toolbar-btns">
+              <button type="button" id="btnResetTilePositions" class="toolbar-action-btn btn-reset-tiles" title="Reset to default center position">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                <span>Reset</span>
+              </button>
+              <button type="button" id="btnDoneTilePositions" class="toolbar-action-btn btn-done-tiles" title="Save positions and exit edit mode">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Done</span>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -592,6 +659,181 @@
             </div>
           </div>
 
+          <!-- Buddha Wallpaper Settings -->
+          <div class="settings-section wallpaper-settings-section">
+            <div class="wallpaper-section-header">
+              <div>
+                <h4 class="section-title">Buddha Meditation Backdrop</h4>
+                <p class="section-subtitle">Select a Gautama Buddha meditation statue or keep pure Zen Dark</p>
+              </div>
+              <span class="wallpaper-status-pill" id="wallpaperStatusPill">None (Zen Dark)</span>
+            </div>
+
+            <!-- Wallpaper Gallery Grid -->
+            <div class="wallpaper-gallery-grid" id="wallpaperGalleryGrid" role="radiogroup" aria-label="Buddha meditation backdrop wallpapers">
+              <!-- Option 0: None (Pure Zen Dark) -->
+              <div class="wallpaper-card active" data-wallpaper="none" role="radio" aria-checked="true" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <div class="wallpaper-preview-none">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                    </svg>
+                  </div>
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Zen Dark</span>
+                <span class="wallpaper-card-sub">No Wallpaper</span>
+              </div>
+
+              <!-- Option 1: Ancient Stone -->
+              <div class="wallpaper-card" data-wallpaper="buddha-1-stone.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-1-stone.jpg" alt="Ancient Stone Gautama Buddha statue in meditation with golden lotus halo" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Ancient Stone</span>
+                <span class="wallpaper-card-sub">Lotus Halo</span>
+              </div>
+
+              <!-- Option 2: Golden Shrine -->
+              <div class="wallpaper-card" data-wallpaper="buddha-2-golden.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-2-golden.jpg" alt="Golden Gautama Buddha statue in candlelight temple shrine" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Golden Shrine</span>
+                <span class="wallpaper-card-sub">Candlelit Temple</span>
+              </div>
+
+              <!-- Option 3: Samadhi Bodhi -->
+              <div class="wallpaper-card" data-wallpaper="buddha-3-samadhi.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-3-samadhi.jpg" alt="Gal Vihara Anuradhapura style Samadhi Buddha statue under Bodhi tree" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Samadhi Bodhi</span>
+                <span class="wallpaper-card-sub">Gal Vihara</span>
+              </div>
+
+              <!-- Option 4: Monastic Bronze -->
+              <div class="wallpaper-card" data-wallpaper="buddha-4-bronze.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-4-bronze.jpg" alt="Antique bronze Gautama Buddha statue in Dhyana Mudra meditation" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Monastic Bronze</span>
+                <span class="wallpaper-card-sub">Antique Bronze</span>
+              </div>
+
+              <!-- Option 5: White Marble -->
+              <div class="wallpaper-card" data-wallpaper="buddha-5-marble.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-5-marble.jpg" alt="White marble Gautama Buddha statue in bamboo grove hermitage" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">White Marble</span>
+                <span class="wallpaper-card-sub">Bamboo Grove</span>
+              </div>
+
+              <!-- Option 6: Mountain Dawn -->
+              <div class="wallpaper-card" data-wallpaper="buddha-6-sunrise.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-6-sunrise.jpg" alt="Cliffside sunrise mountain Gautama Buddha statue in meditation" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Mountain Dawn</span>
+                <span class="wallpaper-card-sub">Sunrise Rays</span>
+              </div>
+
+              <!-- Option 7: Lotus Reflection -->
+              <div class="wallpaper-card" data-wallpaper="buddha-7-lotus.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-7-lotus.jpg" alt="Granite Gautama Buddha statue meditating beside lotus pond with clay oil lamps" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Lotus Pond</span>
+                <span class="wallpaper-card-sub">Clay Oil Lamps</span>
+              </div>
+
+              <!-- Option 8: Milky Way Bodhi -->
+              <div class="wallpaper-card" data-wallpaper="buddha-8-galaxy.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-8-galaxy.jpg" alt="Anuradhapura Samadhi Buddha statue under Bodhi tree and starry Milky Way galaxy" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Milky Way Bodhi</span>
+                <span class="wallpaper-card-sub">Starry Cosmos</span>
+              </div>
+
+              <!-- Option 9: Anuradhapura White Marble -->
+              <div class="wallpaper-card" data-wallpaper="buddha-9-whitemarble.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-9-whitemarble.jpg" alt="Sri Lankan Anuradhapura Samadhi Buddha carved in pure white marble with water lily offerings" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Anuradhapura Marble</span>
+                <span class="wallpaper-card-sub">White Alabaster</span>
+              </div>
+
+              <!-- Option 10: Gal Vihara Granite Monolith -->
+              <div class="wallpaper-card" data-wallpaper="buddha-10-galvihara.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-10-galvihara.jpg" alt="Gal Vihara Polonnaruwa ancient granite monolith Samadhi Buddha statue with stone texture" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Gal Vihara</span>
+                <span class="wallpaper-card-sub">Granite Monolith</span>
+              </div>
+
+              <!-- Option 11: Emerald Jade Forest Temple -->
+              <div class="wallpaper-card" data-wallpaper="buddha-11-emerald.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-11-emerald.jpg" alt="Sri Lankan Samadhi Buddha carved in deep emerald green jadeite stone in a sacred forest temple" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Emerald Jade</span>
+                <span class="wallpaper-card-sub">Forest Sanctuary</span>
+              </div>
+
+              <!-- Option 12: Sandalwood Amber Clay Lamps -->
+              <div class="wallpaper-card" data-wallpaper="buddha-12-amberwood.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-12-amberwood.jpg" alt="Sri Lankan Samadhi Buddha sculpture in warm amber sandalwood surrounded by burning clay oil lamps" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Sandalwood Amber</span>
+                <span class="wallpaper-card-sub">Clay Oil Lamps</span>
+              </div>
+
+              <!-- Option 13: Twilight Sapphire Ruwanwelisaya Night -->
+              <div class="wallpaper-card" data-wallpaper="buddha-13-sapphire.jpg" role="radio" aria-checked="false" tabindex="0">
+                <div class="wallpaper-card-preview">
+                  <img src="images/buddha-13-sapphire.jpg" alt="Sri Lankan Samadhi Buddha carved from dark blue sapphire stone under twilight starlight near Ruwanwelisaya" loading="lazy">
+                  <div class="wallpaper-active-badge">✓</div>
+                </div>
+                <span class="wallpaper-card-title">Twilight Sapphire</span>
+                <span class="wallpaper-card-sub">Ruwanwelisaya Night</span>
+              </div>
+            </div>
+
+            <!-- Wallpaper Intensity Row -->
+            <div class="setting-sub-row hidden" id="wallpaperOpacityRow">
+              <div class="slider-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span class="sub-row-label">Backdrop Visibility / Intensity:</span>
+                <span id="wallpaperOpacityVal" class="slider-val" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 700; font-size: 13px;">28%</span>
+              </div>
+              <input type="range" id="wallpaperOpacitySlider" min="10" max="100" step="5" value="28" class="theme-range-slider" style="width: 100%; margin-bottom: 10px;" aria-label="Backdrop Intensity Slider">
+              <div class="preset-chips-grid opacity-chips-grid">
+                <button type="button" class="preset-chip opacity-chip" data-opacity="0.16">16% Subtle</button>
+                <button type="button" class="preset-chip opacity-chip active" data-opacity="0.28">28% Balanced</button>
+                <button type="button" class="preset-chip opacity-chip" data-opacity="0.50">50% Vivid</button>
+                <button type="button" class="preset-chip opacity-chip" data-opacity="0.75">75% Deep</button>
+                <button type="button" class="preset-chip opacity-chip" data-opacity="1.00">100% Full</button>
+              </div>
+            </div>
+          </div>
+
           <!-- Audio & Feedback -->
           <div class="settings-section">
             <h4 class="section-title">Audio &amp; Meditation Sensory</h4>
@@ -626,6 +868,142 @@
                 <input type="checkbox" id="checkHapticEnabled" aria-label="Enable haptic vibration" checked>
                 <span class="slider"></span>
               </label>
+            </div>
+          </div>
+
+          <!-- Chanting Modes & Blind Mode Entry -->
+          <div class="settings-section">
+            <h4 class="section-title">Chanting Modes</h4>
+            <div class="setting-toggle-row">
+              <div class="toggle-info">
+                <span class="toggle-name">Blind Chanting Mode</span>
+                <span class="toggle-desc">Tap anywhere on screen to count • Shows Buddha backdrop</span>
+              </div>
+              <button type="button" id="btnLaunchBlindFromSettings" class="action-btn-secondary" style="padding: 7px 16px; font-size: 12.5px; border-radius: var(--radius-full); border: 1.5px solid var(--color-accent); color: var(--color-accent); font-weight: 600; white-space: nowrap;">
+                Launch Blind
+              </button>
+            </div>
+          </div>
+
+          <!-- Advanced Settings: Screen Layout, Widget Tiles & Title Customization -->
+          <div class="settings-section advanced-settings-section">
+            <div class="advanced-section-header">
+              <span class="advanced-title-badge">⚡ Advanced Settings</span>
+              <h4 class="section-title" style="margin-top: 5px;">Widget Tiles &amp; Screen Layout</h4>
+              <p class="section-subtitle">Move and resize tiles, choose camera clearance presets, or move Blind Mode tile:</p>
+            </div>
+
+            <!-- Mini Visual Layout Preview Diagram -->
+            <div class="tile-layout-preview-box">
+              <div class="mini-phone-screen" id="miniPhoneScreen">
+                <div class="mini-buddha-silhouette" title="Buddha Statue Area">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="7" r="3.5" opacity="0.35"/>
+                    <path d="M12 11c-3.5 0-6 2-6 5v2h12v-2c0-3-2.5-5-6-5z" opacity="0.25"/>
+                    <ellipse cx="12" cy="19.5" rx="7" ry="1.5" opacity="0.2"/>
+                  </svg>
+                  <span>Buddha Focus</span>
+                </div>
+                <div class="mini-tile-counter" id="miniTileCounter" style="left: 50%; top: 20%;">
+                  <span>Counter</span>
+                </div>
+                <div class="mini-tile-plus" id="miniTilePlus" style="left: 50%; top: 65%;">
+                  <span>+</span>
+                </div>
+              </div>
+              <div class="mini-preview-legend">
+                <span class="legend-item"><span class="legend-dot dot-counter"></span> Card</span>
+                <span class="legend-item"><span class="legend-dot dot-plus"></span> + Button</span>
+                <span class="legend-item"><span class="legend-dot dot-buddha"></span> Statue</span>
+              </div>
+            </div>
+            
+            <div style="margin: 12px 0 14px;">
+              <button type="button" id="btnLaunchTileCustomizer" class="action-btn-primary" style="width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; border-radius: var(--radius-full); font-size: 13.5px; font-weight: 600;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;">
+                  <polyline points="5 9 2 12 5 15"></polyline>
+                  <polyline points="9 5 12 2 15 5"></polyline>
+                  <polyline points="15 19 12 22 9 19"></polyline>
+                  <polyline points="19 9 22 12 19 15"></polyline>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <line x1="12" y1="2" x2="12" y2="22"></line>
+                </svg>
+                <span>Move &amp; Resize Tiles on Screen</span>
+              </button>
+            </div>
+
+            <div class="settings-sub-label" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); margin-bottom: 8px;">
+              Single Mode Layout Presets:
+            </div>
+            <div class="tile-presets-grid" id="settingsTilePresetsGrid">
+              <button type="button" class="tile-preset-chip active" data-preset="default">
+                <span>Default Center</span>
+              </button>
+              <button type="button" class="tile-preset-chip" data-preset="buddha-gaze">
+                <span>Buddha Gazing</span>
+              </button>
+              <button type="button" class="tile-preset-chip" data-preset="zen-clear">
+                <span>Clear Center (Unblocked)</span>
+              </button>
+              <button type="button" class="tile-preset-chip" data-preset="right-thumb">
+                <span>Right Hand</span>
+              </button>
+              <button type="button" class="tile-preset-chip" data-preset="left-thumb">
+                <span>Left Hand</span>
+              </button>
+            </div>
+
+            <!-- Size Sliders -->
+            <div class="tile-slider-row" style="margin-top: 14px;">
+              <div class="slider-header" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                <span class="slider-name" style="color: var(--color-text);">Counter Card Size</span>
+                <span id="labelCounterTileScale" class="slider-val" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 600;">100%</span>
+              </div>
+              <input type="range" id="rangeCounterTileScale" min="70" max="140" step="5" value="100" class="theme-range-slider" style="width: 100%;" aria-label="Counter card size">
+            </div>
+
+            <div class="tile-slider-row" style="margin-top: 12px;">
+              <div class="slider-header" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                <span class="slider-name" style="color: var(--color-text);">Plus Button Size</span>
+                <span id="labelPlusTileScale" class="slider-val" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 600;">100%</span>
+              </div>
+              <input type="range" id="rangePlusTileScale" min="65" max="135" step="5" value="100" class="theme-range-slider" style="width: 100%;" aria-label="Plus button size">
+            </div>
+
+            <!-- Blind Mode Tile Position Presets -->
+            <div class="settings-sub-label" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); margin: 16px 0 8px;">
+              Blind Mode Tile Position:
+            </div>
+            <div class="tile-presets-grid" id="settingsBlindTilePresetsGrid">
+              <button type="button" class="tile-preset-chip blind-preset-chip active" data-blind-pos="top-center">
+                <span>Top Center</span>
+              </button>
+              <button type="button" class="tile-preset-chip blind-preset-chip" data-blind-pos="top-right">
+                <span>Top Right</span>
+              </button>
+              <button type="button" class="tile-preset-chip blind-preset-chip" data-blind-pos="bottom-center">
+                <span>Bottom Pond</span>
+              </button>
+              <button type="button" class="tile-preset-chip blind-preset-chip" data-blind-pos="bottom-right">
+                <span>Bottom Right</span>
+              </button>
+            </div>
+
+            <!-- Edit Current Chant Title in Advanced Settings -->
+            <div class="setting-toggle-row" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.08);">
+              <div class="toggle-info">
+                <span class="toggle-name">Active Chant Title</span>
+                <span class="toggle-desc" id="settingsActiveTitlePreview">Current: 1. Araham</span>
+              </div>
+              <button type="button" id="btnSettingsEditTitle" class="action-btn-secondary" style="padding: 6px 14px; font-size: 12px; border-radius: var(--radius-full); white-space: nowrap;">
+                ✎ Rename Title
+              </button>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <button type="button" id="btnSettingsResetTiles" class="action-btn-secondary" style="width: 100%; justify-content: center; font-size: 12.5px; padding: 8px 14px; border-radius: var(--radius-full); border-color: rgba(255, 255, 255, 0.18);">
+                🗑️ Clear Custom Positions (Reset to Center)
+              </button>
             </div>
           </div>
 
@@ -708,15 +1086,26 @@
     </div>
 
     <!-- Blind Mode Fullscreen Overlay -->
-    <div id="blindModeOverlay" class="blind-mode-overlay hidden" aria-hidden="true">
-      <div class="blind-mode-content">
+    <div id="blindModeOverlay" class="blind-mode-overlay hidden" inert>
+      <!-- Moveable Blind Counter Tile -->
+      <div id="blindCounterTile" class="blind-mode-content widget-tile" data-tile="blind" title="Drag to move tile anywhere on screen">
+        <div class="blind-drag-handle">
+          <span class="handle-grip"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zM7 8a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg> Drag Tile</span>
+        </div>
         <div id="blindCounterDisplay" class="blind-counter-digits">0</div>
-        <div class="blind-hint">Tap anywhere on screen to count</div>
+        <div class="blind-hint">Tap anywhere to count • Drag tile to move</div>
       </div>
-      <button id="btnExitBlindMode" class="btn-exit-blind" aria-label="Exit Blind Mode">
-        <svg viewBox="0 0 20 20" fill="currentColor" class="exit-blind-icon"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-        <span>Exit Blind Mode</span>
-      </button>
+
+      <div class="blind-bottom-bar">
+        <button id="btnResetBlindTile" class="btn-blind-pill" type="button" title="Center blind tile at top">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span>Center</span>
+        </button>
+        <button id="btnExitBlindMode" class="btn-exit-blind" aria-label="Exit Blind Mode">
+          <svg viewBox="0 0 20 20" fill="currentColor" class="exit-blind-icon"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          <span>Exit Blind Mode</span>
+        </button>
+      </div>
     </div>
 
     <!-- New Counter / Edit Counter Modal -->

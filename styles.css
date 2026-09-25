@@ -213,7 +213,7 @@ input {
   border: 0 !important;
 }
 
-/* App Container */
+/* App Container & Buddha Wallpaper Backdrop */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -222,6 +222,45 @@ input {
   position: relative;
   background-color: var(--color-bg);
   transition: background-color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Ambient Buddha Wallpaper Layer - Responsive Desktop & Mobile */
+.buddha-bg-layer {
+  position: fixed;
+  inset: 0;
+  background-image: var(--buddha-bg-img, none);
+  background-position: center 25%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: var(--buddha-bg-opacity, 0);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s ease, background-image 0.25s ease;
+}
+
+@media (max-width: 768px), (orientation: portrait) {
+  .buddha-bg-layer {
+    background-image: var(--buddha-bg-img-mobile, var(--buddha-bg-img, none));
+    background-position: center 18%;
+  }
+}
+
+/* Dark Vignette Overlay - Perfectly calibrated aperture for Kammatthana Buddha gazing */
+.buddha-vignette-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 36%, rgba(3, 13, 8, 0.16) 0%, rgba(3, 8, 6, 0.62) 58%, var(--color-bg) 95%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--buddha-vignette-opacity, 0);
+  transition: opacity 0.4s ease;
+}
+
+@media (max-width: 768px), (orientation: portrait) {
+  .buddha-vignette-overlay {
+    background: radial-gradient(circle at 50% 30%, rgba(3, 13, 8, 0.08) 0%, rgba(3, 8, 6, 0.52) 52%, var(--color-bg) 94%);
+  }
 }
 
 /* ==========================================================================
@@ -604,6 +643,25 @@ input {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(var(--color-accent-rgb), 0.04);
 }
 
+/* Translucent Glass Ring when Buddha Wallpaper is Active for Kammatthana Gazing */
+body.has-buddha-wallpaper .increment-inner-btn {
+  background: radial-gradient(circle at center, rgba(var(--color-accent-rgb), 0.06) 0%, rgba(3, 13, 8, 0.38) 75%);
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  border-color: rgba(var(--color-accent-rgb), 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 25px rgba(var(--color-accent-rgb), 0.08);
+}
+
+body.has-buddha-wallpaper .counter-value-display {
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9), 0 0 28px rgba(0, 0, 0, 0.7);
+}
+
+body.has-buddha-wallpaper .active-chant-title-btn,
+body.has-buddha-wallpaper .chant-pali-text,
+body.has-buddha-wallpaper .goal-progress-text {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95);
+}
+
 .increment-btn:hover .increment-inner-btn {
   border-color: var(--color-accent);
   box-shadow: 0 0 30px var(--color-ring-glow), inset 0 0 30px var(--color-accent-dim);
@@ -712,26 +770,574 @@ input {
   height: 11px;
 }
 
-/* Blind Mode Eye Button */
+/* Blind Mode Toggle Button - Prominent, Elegant & High Contrast */
 .blind-mode-btn {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-border);
-  background-color: var(--color-panel);
-  color: var(--color-text-muted);
-  transition: all 0.2s ease;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-accent);
+  background: linear-gradient(135deg, rgba(255, 214, 49, 0.16) 0%, rgba(14, 20, 16, 0.94) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 14px rgba(var(--color-accent-rgb), 0.35);
+  user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
 }
 
 .blind-mode-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-accent);
+  transition: color 0.2s ease;
+}
+
+.blind-mode-btn .blind-mode-btn-text {
+  color: #ffffff;
+  transition: color 0.2s ease;
 }
 
 .blind-mode-btn:hover {
-  color: var(--color-accent);
+  background: var(--color-accent);
   border-color: var(--color-accent);
-  background-color: var(--color-accent-dim);
+  box-shadow: 0 0 22px var(--color-ring-glow);
+  transform: translateY(-1.5px);
+}
+
+.blind-mode-btn:hover svg,
+.blind-mode-btn:hover .blind-mode-btn-text {
+  color: #010604;
+}
+
+.blind-mode-btn:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================================
+   WIDGET TILES CUSTOMIZATION (Move & Resize on Screen)
+   ========================================================================== */
+
+/* Base transitions on tiles */
+.widget-tile {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Scaling via CSS variables */
+.counter-display-wrap {
+  transform: scale(var(--counter-tile-scale, 1));
+  transform-origin: center top;
+}
+
+.incrementor-zone {
+  transform: scale(var(--plus-tile-scale, 1));
+  transform-origin: center center;
+}
+
+/* Absolute positioning when custom positions are saved */
+.view-single.has-custom-tiles .counter-display-wrap {
+  position: absolute;
+  left: var(--counter-tile-x, 50%);
+  top: var(--counter-tile-y, 20%);
+  transform: translate(-50%, -50%) scale(var(--counter-tile-scale, 1));
+  transform-origin: center center;
+  margin: 0;
+  z-index: 10;
+}
+
+.view-single.has-custom-tiles .incrementor-zone {
+  position: absolute;
+  left: var(--plus-tile-x, 50%);
+  top: var(--plus-tile-y, 65%);
+  transform: translate(-50%, -50%) scale(var(--plus-tile-scale, 1));
+  transform-origin: center center;
+  width: auto;
+  height: auto;
+  flex: none;
+  margin: 0;
+  z-index: 9;
+}
+
+.view-single.has-custom-tiles .single-bottom-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 5;
+}
+
+body.is-customizing-tiles .single-bottom-controls {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* During drag, disable transition so 60fps tracking is instant */
+.widget-tile.is-dragging {
+  transition: none !important;
+  z-index: 100 !important;
+  cursor: grabbing !important;
+}
+
+/* Tile Edit Mode */
+body.is-customizing-tiles {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.is-customizing-tiles .widget-tile {
+  cursor: grab;
+  touch-action: none;
+}
+
+body.is-customizing-tiles .counter-display-wrap {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: 6px;
+  border-radius: 20px;
+  background: rgba(8, 14, 10, 0.76) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 22px rgba(var(--color-accent-rgb), 0.35);
+  padding: 10px 20px;
+}
+
+body.is-customizing-tiles .incrementor-zone {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(var(--color-accent-rgb), 0.4);
+}
+
+/* Edit Handle on each tile */
+.tile-edit-handle {
+  display: none;
+}
+
+body.is-customizing-tiles .tile-edit-handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 3px 10px;
+  background: rgba(12, 18, 14, 0.94);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-accent);
+  pointer-events: auto;
+}
+
+.incrementor-zone .tile-edit-handle {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.handle-grip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: grab;
+  color: var(--color-accent);
+}
+
+.handle-grip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tile-size-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-full);
+  padding: 1px 4px;
+}
+
+.btn-step-size {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--color-accent-rgb), 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-step-size:hover {
+  background: var(--color-accent);
+  color: #000;
+}
+
+.size-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #ffffff;
+  min-width: 32px;
+  text-align: center;
+}
+
+/* Move Tiles Trigger Button in Bottom Controls */
+.bottom-center-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.customize-tiles-trigger-btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: rgba(14, 20, 16, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+.customize-tiles-trigger-btn svg {
+  width: 15px;
+  height: 15px;
+  color: var(--color-accent);
+}
+
+.customize-tiles-trigger-btn:hover {
+  border-color: var(--color-accent);
+  color: #ffffff;
+  background: rgba(var(--color-accent-rgb), 0.14);
+  transform: translateY(-1.5px);
+}
+
+/* Floating Customization Toolbar */
+.tiles-customize-toolbar {
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 16, 12, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid var(--color-accent);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(var(--color-accent-rgb), 0.35);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  z-index: 500;
+  width: min(94vw, 560px);
+  box-sizing: border-box;
+}
+
+.tiles-customize-toolbar.hidden {
+  display: none !important;
+}
+
+.tiles-toolbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tiles-toolbar-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.3px;
+}
+
+.toolbar-sub {
+  font-size: 11px;
+  color: var(--color-text-dim);
+}
+
+.tiles-toolbar-presets {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toolbar-preset-btn {
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-muted);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.toolbar-preset-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(var(--color-accent-rgb), 0.12);
+}
+
+.tiles-toolbar-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toolbar-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-reset-tiles {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--color-text);
+}
+
+.btn-reset-tiles:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-done-tiles {
+  background: var(--color-accent);
+  border: 1.5px solid var(--color-accent);
+  color: #010604;
+  box-shadow: 0 0 14px var(--color-ring-glow);
+}
+
+.btn-done-tiles:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 0 20px var(--color-ring-glow);
+}
+
+/* Settings Drawer Presets Grid */
+.tile-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.tile-preset-chip {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.tile-preset-chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: rgba(var(--color-accent-rgb), 0.1);
+}
+
+.tile-preset-chip.active {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(var(--color-accent-rgb), 0.15);
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(var(--color-accent-rgb), 0.2);
+}
+
+/* Advanced Settings Styling in Settings Drawer */
+.advanced-settings-section {
+  border: 1px solid rgba(var(--color-accent-rgb), 0.25);
+  background: rgba(var(--color-accent-rgb), 0.035);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  margin-top: 20px;
+}
+
+.advanced-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--color-accent);
+  background: rgba(var(--color-accent-rgb), 0.12);
+  border: 1px solid rgba(var(--color-accent-rgb), 0.3);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* Mini Layout Preview Box inside Advanced Settings */
+.tile-layout-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin: 10px 0 14px;
+}
+
+.mini-phone-screen {
+  position: relative;
+  width: 140px;
+  height: 180px;
+  border: 1.5px solid rgba(var(--color-accent-rgb), 0.35);
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 40%, rgba(20, 32, 24, 0.6) 0%, rgba(5, 10, 7, 0.95) 100%);
+  overflow: hidden;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.mini-buddha-silhouette {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-accent);
+  pointer-events: none;
+}
+
+.mini-buddha-silhouette svg {
+  width: 52px;
+  height: 52px;
+}
+
+.mini-buddha-silhouette span {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.4;
+  margin-top: -6px;
+}
+
+.mini-tile-counter {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(14, 24, 18, 0.92);
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 0 0 6px rgba(var(--color-accent-rgb), 0.4);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.mini-tile-plus {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(14, 24, 18, 0.92);
+  border: 1.5px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+  box-shadow: 0 0 6px rgba(var(--color-accent-rgb), 0.4);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.mini-preview-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 10.5px;
+  color: var(--color-text-muted);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.dot-counter {
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.dot-plus {
+  background: var(--color-accent);
+}
+
+.dot-buddha {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* ==========================================================================
@@ -1071,6 +1677,144 @@ input {
 .card-zen-focus-btn:hover {
   border-color: var(--color-accent);
   background-color: var(--color-accent-dim);
+}
+
+/* Advance Mode Contrast & Clarity when Buddha Wallpaper is Active */
+body.has-buddha-wallpaper .view-multi {
+  background: radial-gradient(circle at 50% 25%, rgba(3, 10, 7, 0.45) 0%, rgba(3, 8, 6, 0.75) 100%);
+}
+
+body.has-buddha-wallpaper .multi-controls-bar {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+body.has-buddha-wallpaper .stat-pill {
+  background: rgba(8, 14, 11, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.has-buddha-wallpaper .stat-label {
+  color: #c5d2cb;
+}
+
+body.has-buddha-wallpaper .action-btn-secondary {
+  background: rgba(8, 14, 11, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--color-accent-rgb), 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.has-buddha-wallpaper .counter-display-wrap {
+  background: rgba(8, 14, 11, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 10px 24px 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+body.has-buddha-wallpaper .goal-progress-text {
+  color: #e2ece6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  font-weight: 600;
+}
+
+body.has-buddha-wallpaper .counter-card {
+  background: rgba(8, 14, 11, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(var(--color-accent-rgb), 0.35);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+body.has-buddha-wallpaper .counter-card:hover {
+  background: rgba(12, 20, 16, 0.95);
+  border-color: var(--color-accent);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(var(--color-accent-rgb), 0.25);
+}
+
+body.has-buddha-wallpaper .counter-card.is-active-focus {
+  border-color: var(--color-accent);
+  background: rgba(14, 22, 18, 0.96);
+  box-shadow: 0 0 24px rgba(var(--color-accent-rgb), 0.38);
+}
+
+body.has-buddha-wallpaper .card-title-input {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+body.has-buddha-wallpaper .card-subtext {
+  color: #d1dbd5;
+  font-weight: 500;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+body.has-buddha-wallpaper .card-count-box {
+  background-color: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px 0;
+}
+
+body.has-buddha-wallpaper .card-count-value {
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-shadow: 0 0 16px rgba(var(--color-accent-rgb), 0.5), 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+body.has-buddha-wallpaper .card-progress-bar-wrap {
+  background-color: rgba(255, 255, 255, 0.14);
+  height: 5px;
+}
+
+body.has-buddha-wallpaper .card-progress-text {
+  color: #d1dbd5;
+  font-weight: 600;
+}
+
+body.has-buddha-wallpaper .card-tap-btn.btn-plus {
+  background: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.3) 0%, rgba(var(--color-accent-rgb), 0.18) 100%);
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.has-buddha-wallpaper .card-tap-btn.btn-plus:hover {
+  background: var(--color-accent);
+  color: #010604;
+  box-shadow: 0 0 20px var(--color-ring-glow);
+}
+
+body.has-buddha-wallpaper .card-tap-btn.btn-minus {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e2e8e4;
+}
+
+body.has-buddha-wallpaper .card-tap-btn.btn-minus:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+body.has-buddha-wallpaper .card-action-icon-btn {
+  color: #c5d2cb;
+}
+
+body.has-buddha-wallpaper .card-zen-focus-btn {
+  background-color: rgba(8, 14, 11, 0.88);
+  border-color: rgba(var(--color-accent-rgb), 0.4);
 }
 
 /* ==========================================================================
@@ -1419,6 +2163,247 @@ input {
   gap: 14px;
 }
 
+.setting-sub-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: var(--color-panel-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-top: -4px;
+}
+
+.sub-row-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.opacity-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 6px;
+}
+
+.opacity-chip {
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+}
+
+/* Custom Styled Range Sliders across Settings */
+.theme-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-range-slider:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.theme-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.5), 0 2px 5px rgba(0, 0, 0, 0.4);
+  border: 2px solid #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-range-slider::-webkit-slider-thumb:hover,
+.theme-range-slider::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+  box-shadow: 0 0 14px rgba(var(--color-accent-rgb), 0.8), 0 3px 8px rgba(0, 0, 0, 0.6);
+}
+
+.theme-range-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.5), 0 2px 5px rgba(0, 0, 0, 0.4);
+  border: 2px solid #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Wallpaper Gallery Grid & Cards */
+.wallpaper-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wallpaper-status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.wallpaper-status-pill.active {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  border-color: rgba(245, 166, 35, 0.4);
+}
+
+.wallpaper-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 360px) {
+  .wallpaper-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.wallpaper-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-panel-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 6px 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  text-align: center;
+  outline: none;
+}
+
+.wallpaper-card:hover {
+  border-color: rgba(245, 166, 35, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.wallpaper-card:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-dim);
+}
+
+.wallpaper-card.active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-dim);
+  box-shadow: 0 0 14px rgba(245, 166, 35, 0.28);
+}
+
+.wallpaper-card-preview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  background-color: #0d120f;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wallpaper-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.wallpaper-card:hover .wallpaper-card-preview img {
+  transform: scale(1.06);
+}
+
+.wallpaper-preview-none {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #090e0b 0%, #151d18 100%);
+  color: var(--color-text-muted);
+}
+
+.wallpaper-preview-none svg {
+  width: 22px;
+  height: 22px;
+  opacity: 0.65;
+}
+
+.wallpaper-active-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: #000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.wallpaper-card.active .wallpaper-active-badge {
+  display: flex;
+}
+
+.wallpaper-card-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.wallpaper-card-sub {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.wallpaper-card.active .wallpaper-card-title {
+  color: var(--color-accent);
+}
+
 .toggle-info {
   display: flex;
   flex-direction: column;
@@ -1565,6 +2550,12 @@ kbd {
    BLIND MODE SCREEN OVERLAY
    ========================================================================== */
 
+body.is-blind-mode .app-header,
+body.is-blind-mode .main-content {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .blind-mode-overlay {
   position: fixed;
   inset: 0;
@@ -1577,67 +2568,185 @@ kbd {
   padding: 24px;
   cursor: pointer;
   touch-action: manipulation;
+  transition: background-color 0.3s ease;
+}
+
+/* When Buddha wallpaper is active, let the serene Buddha statue show in Blind Mode! */
+body.has-buddha-wallpaper .blind-mode-overlay {
+  background-color: transparent;
+  background: radial-gradient(circle at 50% 36%, rgba(3, 13, 8, 0.1) 0%, rgba(3, 8, 6, 0.45) 58%, rgba(1, 6, 4, 0.88) 96%);
 }
 
 .blind-mode-content {
+  position: absolute;
+  left: var(--blind-tile-x, 50%);
+  top: var(--blind-tile-y, 16%);
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 4px;
+  background: rgba(8, 14, 10, 0.82);
+  padding: 8px 24px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 16px rgba(var(--color-accent-rgb), 0.22);
+  width: auto;
+  max-width: 90%;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+}
+
+body.has-buddha-wallpaper .blind-mode-content {
+  position: absolute;
+  left: var(--blind-tile-x, 50%);
+  top: var(--blind-tile-y, 16%);
+  transform: translate(-50%, -50%);
+  background: rgba(8, 14, 10, 0.82);
+  padding: 8px 24px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 16px rgba(var(--color-accent-rgb), 0.22);
+}
+
+.blind-mode-content:active,
+.blind-mode-content.is-dragging {
+  cursor: grabbing;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 28px rgba(var(--color-accent-rgb), 0.5) !important;
+  transition: none !important;
+}
+
+.blind-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
   pointer-events: none;
+}
+
+.blind-drag-handle .handle-grip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+.blind-drag-handle svg {
+  width: 13px;
+  height: 13px;
 }
 
 .blind-counter-digits {
   font-family: var(--font-mono);
-  font-size: clamp(80px, 25vw, 180px);
-  font-weight: 200;
+  font-size: clamp(64px, 20vw, 120px);
+  font-weight: 300;
   color: var(--color-accent);
-  opacity: 0.85;
+  opacity: 0.95;
+  text-shadow: 0 0 20px var(--color-ring-glow), 0 2px 10px rgba(0, 0, 0, 0.8);
+  line-height: 1;
 }
 
 .blind-hint {
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--color-text-muted);
-  opacity: 0.6;
+  opacity: 0.85;
   text-align: center;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
-.btn-exit-blind {
+.blind-bottom-bar {
   position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 16px) + 24px);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 201;
+  pointer-events: auto;
+}
+
+.btn-blind-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-full);
+  background-color: rgba(3, 10, 7, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-blind-pill svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent);
+}
+
+.btn-blind-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1.5px);
+}
+
+.blind-bottom-bar .btn-exit-blind {
+  position: static;
+  transform: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-full);
-  background-color: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(3, 10, 7, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--color-text-muted);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  opacity: 0.35;
+  opacity: 0.75;
   transition: all 0.25s ease;
   pointer-events: auto;
   cursor: pointer;
-  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
-.btn-exit-blind .exit-blind-icon {
+.blind-bottom-bar .btn-exit-blind .exit-blind-icon {
   width: 14px;
   height: 14px;
 }
 
-.btn-exit-blind:hover,
-.btn-exit-blind:focus-visible {
-  opacity: 0.9;
-  color: var(--color-accent);
+.blind-bottom-bar .btn-exit-blind:hover,
+.blind-bottom-bar .btn-exit-blind:focus-visible {
+  opacity: 1;
+  color: var(--color-text);
   border-color: var(--color-accent);
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1.5px);
 }
 
 /* ==========================================================================
@@ -1732,6 +2841,113 @@ kbd {
 
   .chant-pali-text {
     font-size: 13px;
+  }
+
+  /* Mobile Kammatthana Gazing Layout when Buddha Wallpaper is Active */
+  body.has-buddha-wallpaper .view-single {
+    justify-content: space-between;
+    padding-top: 8px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body.has-buddha-wallpaper .counter-display-wrap {
+    margin-top: 4px;
+    background: rgba(7, 10, 8, 0.48);
+    padding: 8px 18px 10px;
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    max-width: 90%;
+  }
+
+  body.has-buddha-wallpaper .counter-value-display {
+    font-size: clamp(48px, 14vw, 68px);
+    line-height: 1;
+    margin: 2px 0;
+  }
+
+  body.has-buddha-wallpaper .active-chant-title-btn {
+    font-size: 13px;
+    padding: 2px 8px;
+  }
+
+  body.has-buddha-wallpaper .chant-pali-text {
+    font-size: 12.5px;
+  }
+
+  body.has-buddha-wallpaper .incrementor-zone {
+    margin-bottom: 6px;
+  }
+
+  body.has-buddha-wallpaper .increment-btn {
+    width: clamp(170px, 45vw, 220px);
+    height: clamp(170px, 45vw, 220px);
+  }
+
+  body.has-buddha-wallpaper .increment-inner-btn {
+    background: radial-gradient(circle at center, rgba(var(--color-accent-rgb), 0.08) 0%, rgba(3, 13, 8, 0.3) 75%);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border-color: rgba(var(--color-accent-rgb), 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(var(--color-accent-rgb), 0.08);
+  }
+
+  .single-bottom-controls {
+    padding: 0 12px calc(14px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .bottom-center-actions {
+    gap: 6px;
+  }
+
+  .footer-hint {
+    display: none;
+  }
+
+  .customize-tiles-trigger-btn {
+    height: 38px;
+    padding: 0 11px;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .blind-mode-btn {
+    height: 38px;
+    padding: 0 13px;
+    font-size: 12px;
+    gap: 6px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 214, 49, 0.22) 0%, rgba(14, 20, 16, 0.95) 100%);
+    border: 1.5px solid var(--color-accent);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), 0 0 16px rgba(var(--color-accent-rgb), 0.45);
+  }
+
+  .blind-mode-btn svg {
+    width: 17px;
+    height: 17px;
+    color: var(--color-accent);
+  }
+
+  .blind-mode-btn-text {
+    display: inline;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .tiles-customize-toolbar {
+    width: calc(100vw - 20px);
+    padding: 8px 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px;
+  }
+
+  .tiles-toolbar-presets {
+    display: none;
   }
 
   .preset-chips-grid {

@@ -31,6 +31,9 @@
     soundEnabled: false, // Default: Music / chime off
     bellEnabled: false, // Default: Bell chime off
     hapticEnabled: true,
+    buddhaBgEnabled: false,
+    activeWallpaper: 'none',
+    buddhaBgOpacity: 0.28,
     counters: [
       {
         id: 'counter-default',
@@ -40,7 +43,13 @@
         goal: 108,
         step: 1
       }
-    ]
+    ],
+    tileLayout: {
+      customized: false,
+      counter: { x: 50, y: 20, scale: 1.0 },
+      plus: { x: 50, y: 65, scale: 1.0 },
+      preset: 'default'
+    }
   };
 
   // --- Web Audio API Engine for Organic Sound Generation ---
@@ -179,19 +188,23 @@
       if (saved) {
         const parsed = JSON.parse(saved);
         state = Object.assign(state, parsed);
-        // Ensure yellow theme default and sound off as requested by user
-        if (!state.userCustomizedV2) {
+        // Ensure no wallpaper by default, yellow theme, and sound off as requested
+        if (!state.userCustomizedV3) {
           state.theme = 'gold';
           state.soundEnabled = false;
           state.bellEnabled = false;
-          state.userCustomizedV2 = true;
+          state.buddhaBgEnabled = false;
+          state.activeWallpaper = 'none';
+          state.userCustomizedV3 = true;
           saveState();
         }
       } else {
         state.theme = 'gold';
         state.soundEnabled = false;
         state.bellEnabled = false;
-        state.userCustomizedV2 = true;
+        state.buddhaBgEnabled = false;
+        state.activeWallpaper = 'none';
+        state.userCustomizedV3 = true;
       }
     } catch (e) {
       console.error('Failed to parse saved state:', e);
@@ -209,6 +222,18 @@
           step: 1
         }
       ];
+    }
+
+    if (!state.tileLayout) {
+      state.tileLayout = {
+        customized: false,
+        counter: { x: 50, y: 20, scale: 1.0 },
+        plus: { x: 50, y: 65, scale: 1.0 },
+        preset: 'default'
+      };
+    } else {
+      if (!state.tileLayout.counter) state.tileLayout.counter = { x: 50, y: 20, scale: 1.0 };
+      if (!state.tileLayout.plus) state.tileLayout.plus = { x: 50, y: 65, scale: 1.0 };
     }
 
     if (!getActiveCounter()) {
@@ -244,6 +269,30 @@
   const elBlindModeOverlay = document.getElementById('blindModeOverlay');
   const elBlindCounterDisplay = document.getElementById('blindCounterDisplay');
   const elBtnExitBlindMode = document.getElementById('btnExitBlindMode');
+
+  // Tile Customization elements
+  const elTileCounterCard = document.getElementById('tileCounterCard');
+  const elTileIncrementor = document.getElementById('tileIncrementor');
+  const elBtnToggleCustomizeTiles = document.getElementById('btnToggleCustomizeTiles');
+  const elTilesCustomizeToolbar = document.getElementById('tilesCustomizeToolbar');
+  const elBtnResetTilePositions = document.getElementById('btnResetTilePositions');
+  const elBtnDoneTilePositions = document.getElementById('btnDoneTilePositions');
+  const elCounterTileSizeVal = document.getElementById('counterTileSizeVal');
+  const elPlusTileSizeVal = document.getElementById('plusTileSizeVal');
+
+  // Settings Drawer tile controls
+  const elBtnLaunchTileCustomizer = document.getElementById('btnLaunchTileCustomizer');
+  const elSettingsTilePresetsGrid = document.getElementById('settingsTilePresetsGrid');
+  const elSettingsBlindTilePresetsGrid = document.getElementById('settingsBlindTilePresetsGrid');
+  const elBlindCounterTile = document.getElementById('blindCounterTile');
+  const elBtnResetBlindTile = document.getElementById('btnResetBlindTile');
+  const elRangeCounterTileScale = document.getElementById('rangeCounterTileScale');
+  const elRangePlusTileScale = document.getElementById('rangePlusTileScale');
+  const elLabelCounterTileScale = document.getElementById('labelCounterTileScale');
+  const elLabelPlusTileScale = document.getElementById('labelPlusTileScale');
+  const elBtnSettingsResetTiles = document.getElementById('btnSettingsResetTiles');
+  const elBtnSettingsEditTitle = document.getElementById('btnSettingsEditTitle');
+  const elSettingsActiveTitlePreview = document.getElementById('settingsActiveTitlePreview');
 
   // Header badges
   const elHeaderGoalVal = document.getElementById('headerGoalVal');
@@ -323,6 +372,87 @@
     saveState();
   }
 
+  const WALLPAPERS = [
+    { id: 'none', title: 'Zen Dark', subtitle: 'No Wallpaper' },
+    { id: 'buddha-1-stone.jpg', title: 'Ancient Stone', subtitle: 'Lotus Halo' },
+    { id: 'buddha-2-golden.jpg', title: 'Golden Shrine', subtitle: 'Candlelit Temple' },
+    { id: 'buddha-3-samadhi.jpg', title: 'Samadhi Bodhi', subtitle: 'Gal Vihara' },
+    { id: 'buddha-4-bronze.jpg', title: 'Monastic Bronze', subtitle: 'Antique Bronze' },
+    { id: 'buddha-5-marble.jpg', title: 'White Marble', subtitle: 'Bamboo Grove' },
+    { id: 'buddha-6-sunrise.jpg', title: 'Mountain Dawn', subtitle: 'Sunrise Rays' },
+    { id: 'buddha-7-lotus.jpg', title: 'Lotus Pond', subtitle: 'Clay Oil Lamps' },
+    { id: 'buddha-8-galaxy.jpg', title: 'Milky Way Bodhi', subtitle: 'Starry Cosmos' },
+    { id: 'buddha-9-whitemarble.jpg', title: 'Anuradhapura Marble', subtitle: 'White Alabaster' },
+    { id: 'buddha-10-galvihara.jpg', title: 'Gal Vihara', subtitle: 'Granite Monolith' },
+    { id: 'buddha-11-emerald.jpg', title: 'Emerald Jade', subtitle: 'Forest Sanctuary' },
+    { id: 'buddha-12-amberwood.jpg', title: 'Sandalwood Amber', subtitle: 'Clay Oil Lamps' },
+    { id: 'buddha-13-sapphire.jpg', title: 'Twilight Sapphire', subtitle: 'Ruwanwelisaya Night' },
+  ];
+
+  function applyBuddhaWallpaper() {
+    const isEnabled = Boolean(state.buddhaBgEnabled && state.activeWallpaper && state.activeWallpaper !== 'none');
+    const opacity = isEnabled ? (state.buddhaBgOpacity !== undefined ? state.buddhaBgOpacity : 0.28) : 0;
+    
+    document.documentElement.style.setProperty('--buddha-bg-opacity', opacity);
+    document.documentElement.style.setProperty('--buddha-vignette-opacity', isEnabled ? '1' : '0');
+
+    if (isEnabled) {
+      document.documentElement.style.setProperty('--buddha-bg-img', `url('images/${state.activeWallpaper}')`);
+      document.documentElement.style.setProperty('--buddha-bg-img-mobile', `url('images/mobile/${state.activeWallpaper}')`);
+      document.body.classList.add('has-buddha-wallpaper');
+    } else {
+      document.documentElement.style.setProperty('--buddha-bg-img', 'none');
+      document.documentElement.style.setProperty('--buddha-bg-img-mobile', 'none');
+      document.body.classList.remove('has-buddha-wallpaper');
+    }
+
+    const bgLayer = document.getElementById('buddhaBgLayer');
+    if (bgLayer) {
+      bgLayer.style.backgroundImage = '';
+    }
+
+    // Update status pill badge
+    const badge = document.getElementById('wallpaperStatusPill');
+    if (badge) {
+      if (!isEnabled) {
+        badge.textContent = 'None (Zen Dark)';
+        badge.classList.remove('active');
+      } else {
+        const found = WALLPAPERS.find(w => w.id === state.activeWallpaper);
+        badge.textContent = found ? found.title : 'Active';
+        badge.classList.add('active');
+      }
+    }
+
+    // Update gallery cards active state
+    document.querySelectorAll('.wallpaper-card').forEach(card => {
+      const cardId = card.dataset.wallpaper;
+      const isActive = (!isEnabled && cardId === 'none') || (isEnabled && cardId === state.activeWallpaper);
+      card.classList.toggle('active', isActive);
+      card.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    });
+
+    // Opacity row visibility
+    const elOpacityRow = document.getElementById('wallpaperOpacityRow');
+    if (elOpacityRow) {
+      if (isEnabled) elOpacityRow.classList.remove('hidden');
+      else elOpacityRow.classList.add('hidden');
+    }
+
+    // Opacity chips and slider active state
+    const currentOp = state.buddhaBgOpacity !== undefined ? state.buddhaBgOpacity : 0.28;
+    const currentPct = Math.round(currentOp * 100);
+
+    const elOpacitySlider = document.getElementById('wallpaperOpacitySlider');
+    const elOpacityVal = document.getElementById('wallpaperOpacityVal');
+    if (elOpacitySlider) elOpacitySlider.value = currentPct;
+    if (elOpacityVal) elOpacityVal.textContent = `${currentPct}%`;
+
+    document.querySelectorAll('.opacity-chip').forEach(chip => {
+      chip.classList.toggle('active', Math.abs(Number(chip.dataset.opacity) - currentOp) < 0.05);
+    });
+  }
+
   function renderHeader() {
     const active = getActiveCounter();
     if (!active) return;
@@ -337,6 +467,7 @@
     if (elActiveChantTitle) {
       elActiveChantTitle.textContent = active.name || 'Unnamed Chant';
     }
+    updateSettingsTitlePreview();
 
     // Sound toggle icon (if present in header)
     if (elIconSoundOn && elIconSoundOff) {
@@ -573,6 +704,7 @@
     renderHeader();
     renderSingleCounter();
     renderMultiCounters();
+    applyTileLayout();
   }
 
   // --- Increment & Decrement Logic ---
@@ -935,22 +1067,143 @@
     });
 
     // Blind Mode
-    elBtnBlindModeToggle.addEventListener('click', () => {
+    function enterBlindMode() {
+      document.body.classList.add('is-blind-mode');
+      elBlindModeOverlay.removeAttribute('inert');
       elBlindModeOverlay.classList.remove('hidden');
-      elBlindCounterDisplay.textContent = Number(getActiveCounter().count || 0).toLocaleString();
+      const active = getActiveCounter();
+      elBlindCounterDisplay.textContent = Number(active ? active.count : 0).toLocaleString();
       showToast('Blind Mode activated. Tap anywhere on screen.');
-    });
+    }
+
+    function exitBlindMode() {
+      document.body.classList.remove('is-blind-mode');
+      elBlindModeOverlay.classList.add('hidden');
+      elBlindModeOverlay.setAttribute('inert', '');
+    }
+
+    elBtnBlindModeToggle.addEventListener('click', enterBlindMode);
+
+    // Blind Mode Interactive Tile Dragging
+    let lastBlindDragEndTime = 0;
+
+    if (elBlindCounterTile) {
+      let bStartX = 0, bStartY = 0;
+      let bInitXPercent = 50, bInitYPercent = 16;
+      let bIsDragging = false;
+      let bHasMoved = false;
+
+      elBlindCounterTile.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        const rect = elBlindModeOverlay.getBoundingClientRect();
+        const tileRect = elBlindCounterTile.getBoundingClientRect();
+
+        const currentCenterX = (tileRect.left + tileRect.width / 2) - rect.left;
+        const currentCenterY = (tileRect.top + tileRect.height / 2) - rect.top;
+
+        bInitXPercent = (currentCenterX / rect.width) * 100;
+        bInitYPercent = (currentCenterY / rect.height) * 100;
+
+        bStartX = e.clientX;
+        bStartY = e.clientY;
+        bIsDragging = true;
+        bHasMoved = false;
+
+        try {
+          elBlindCounterTile.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      });
+
+      elBlindCounterTile.addEventListener('pointermove', (e) => {
+        if (!bIsDragging) return;
+        const dx = e.clientX - bStartX;
+        const dy = e.clientY - bStartY;
+
+        if (Math.hypot(dx, dy) > 5) {
+          bHasMoved = true;
+          elBlindCounterTile.classList.add('is-dragging');
+        }
+
+        if (!bHasMoved) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const rect = elBlindModeOverlay.getBoundingClientRect();
+        let newX = bInitXPercent + (dx / rect.width) * 100;
+        let newY = bInitYPercent + (dy / rect.height) * 100;
+
+        newX = Math.max(15, Math.min(85, newX));
+        newY = Math.max(10, Math.min(90, newY));
+
+        elBlindModeOverlay.style.setProperty('--blind-tile-x', `${newX}%`);
+        elBlindModeOverlay.style.setProperty('--blind-tile-y', `${newY}%`);
+
+        if (!state.tileLayout.blind) state.tileLayout.blind = {};
+        state.tileLayout.blind.x = Math.round(newX);
+        state.tileLayout.blind.y = Math.round(newY);
+      });
+
+      const handleBlindPointerUp = (e) => {
+        if (!bIsDragging) return;
+        bIsDragging = false;
+        elBlindCounterTile.classList.remove('is-dragging');
+
+        try {
+          elBlindCounterTile.releasePointerCapture(e.pointerId);
+        } catch (_) {}
+
+        if (bHasMoved) {
+          lastBlindDragEndTime = Date.now();
+          saveState();
+          triggerHaptic('light');
+          updateBlindPresetChipsActive();
+          showToast('Blind tile position saved');
+        } else {
+          // If clicked without moving, count +1
+          const active = getActiveCounter();
+          if (active) incrementCounter(active);
+        }
+      };
+
+      elBlindCounterTile.addEventListener('pointerup', handleBlindPointerUp);
+      elBlindCounterTile.addEventListener('pointercancel', handleBlindPointerUp);
+    }
 
     elBlindModeOverlay.addEventListener('click', (e) => {
-      if (e.target.closest('#btnExitBlindMode')) return;
+      if (Date.now() - lastBlindDragEndTime < 350) return;
+      if (e.target.closest('#btnExitBlindMode, #btnResetBlindTile, #blindCounterTile')) return;
       const active = getActiveCounter();
       if (active) incrementCounter(active);
     });
 
+    if (elBtnResetBlindTile) {
+      elBtnResetBlindTile.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!state.tileLayout.blind) state.tileLayout.blind = {};
+        state.tileLayout.blind.x = 50;
+        state.tileLayout.blind.y = 16;
+        elBlindModeOverlay.style.setProperty('--blind-tile-x', '50%');
+        elBlindModeOverlay.style.setProperty('--blind-tile-y', '16%');
+        saveState();
+        triggerHaptic('light');
+        updateBlindPresetChipsActive();
+        showToast('Blind tile centered');
+      });
+    }
+
     elBtnExitBlindMode.addEventListener('click', (e) => {
       e.stopPropagation();
-      elBlindModeOverlay.classList.add('hidden');
+      exitBlindMode();
     });
+
+    const elBtnLaunchBlindFromSettings = document.getElementById('btnLaunchBlindFromSettings');
+    if (elBtnLaunchBlindFromSettings) {
+      elBtnLaunchBlindFromSettings.addEventListener('click', () => {
+        closeModal(elDrawerSettings);
+        enterBlindMode();
+      });
+    }
 
     // Settings inside drawer
     elCheckSoundEnabled.checked = state.soundEnabled;
@@ -971,6 +1224,75 @@
       state.hapticEnabled = e.target.checked;
       saveState();
     });
+
+    // Buddha Wallpaper Gallery & Opacity Settings
+    document.querySelectorAll('.wallpaper-card').forEach(card => {
+      const handleSelect = () => {
+        const wpId = card.dataset.wallpaper;
+        if (wpId === 'none') {
+          state.buddhaBgEnabled = false;
+          state.activeWallpaper = 'none';
+          showToast('Wallpaper: Zen Dark (None)');
+        } else {
+          state.buddhaBgEnabled = true;
+          state.activeWallpaper = wpId;
+          const cardTitle = card.querySelector('.wallpaper-card-title')?.textContent?.trim() || 'Buddha Wallpaper';
+          showToast(`Wallpaper set: ${cardTitle}`);
+        }
+        triggerHaptic([12]);
+        saveState();
+        applyBuddhaWallpaper();
+      };
+
+      card.addEventListener('click', handleSelect);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelect();
+        }
+      });
+    });
+
+    document.querySelectorAll('.opacity-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        state.buddhaBgOpacity = Number(chip.dataset.opacity);
+        if (state.activeWallpaper === 'none' || !state.buddhaBgEnabled) {
+          state.buddhaBgEnabled = true;
+          state.activeWallpaper = 'buddha-1-stone.jpg';
+        }
+        triggerHaptic([8]);
+        saveState();
+        applyBuddhaWallpaper();
+        showToast(`Backdrop visibility: ${chip.textContent.trim()}`);
+      });
+    });
+
+    const elWallpaperOpacitySlider = document.getElementById('wallpaperOpacitySlider');
+    if (elWallpaperOpacitySlider) {
+      elWallpaperOpacitySlider.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        state.buddhaBgOpacity = val / 100;
+        if (state.activeWallpaper === 'none' || !state.buddhaBgEnabled) {
+          state.buddhaBgEnabled = true;
+          state.activeWallpaper = 'buddha-1-stone.jpg';
+        }
+        const elVal = document.getElementById('wallpaperOpacityVal');
+        if (elVal) elVal.textContent = `${val}%`;
+        document.documentElement.style.setProperty('--buddha-bg-opacity', state.buddhaBgOpacity);
+        document.documentElement.style.setProperty('--buddha-vignette-opacity', '1');
+        document.body.classList.add('has-buddha-wallpaper');
+        document.querySelectorAll('.opacity-chip').forEach(chip => {
+          chip.classList.toggle('active', Math.abs(Number(chip.dataset.opacity) - state.buddhaBgOpacity) < 0.04);
+        });
+      });
+
+      elWallpaperOpacitySlider.addEventListener('change', () => {
+        triggerHaptic([8]);
+        saveState();
+        applyBuddhaWallpaper();
+        showToast(`Backdrop intensity: ${Math.round(state.buddhaBgOpacity * 100)}%`);
+      });
+    }
 
     // Theme palette switches
     elPaletteSwatches.forEach(swatch => {
@@ -1090,7 +1412,8 @@
 
       if (e.key === 'Escape') {
         closeAllModals();
-        elBlindModeOverlay.classList.add('hidden');
+        exitBlindMode();
+        exitTileCustomizeMode(true);
         return;
       }
 
@@ -1122,18 +1445,454 @@
       else if (e.key === 'b' || e.key === 'B') {
         e.preventDefault();
         if (elBlindModeOverlay.classList.contains('hidden')) {
-          elBtnBlindModeToggle.click();
+          enterBlindMode();
         } else {
-          elBlindModeOverlay.classList.add('hidden');
+          exitBlindMode();
         }
       }
     });
+
+    setupTileCustomization();
+  }
+
+  // --- Widget Tile Customization Engine (Move & Resize on Screen) ---
+  function applyTileLayout() {
+    if (!state.tileLayout) {
+      state.tileLayout = {
+        customized: false,
+        counter: { x: 50, y: 20, scale: 1.0 },
+        plus: { x: 50, y: 65, scale: 1.0 },
+        blind: { x: 50, y: 16 },
+        preset: 'default'
+      };
+    }
+    if (!state.tileLayout.blind) {
+      state.tileLayout.blind = { x: 50, y: 16 };
+    }
+
+    const { customized, counter, plus, blind } = state.tileLayout;
+
+    // Apply scale CSS variables
+    const counterScale = Number(counter && counter.scale ? counter.scale : 1.0);
+    const plusScale = Number(plus && plus.scale ? plus.scale : 1.0);
+    elViewSingle.style.setProperty('--counter-tile-scale', counterScale.toString());
+    elViewSingle.style.setProperty('--plus-tile-scale', plusScale.toString());
+
+    // Apply blind tile coordinates
+    if (elBlindModeOverlay) {
+      elBlindModeOverlay.style.setProperty('--blind-tile-x', `${blind.x || 50}%`);
+      elBlindModeOverlay.style.setProperty('--blind-tile-y', `${blind.y || 16}%`);
+    }
+
+    // Update labels and sliders
+    const counterPercent = Math.round(counterScale * 100);
+    const plusPercent = Math.round(plusScale * 100);
+
+    if (elCounterTileSizeVal) elCounterTileSizeVal.textContent = `${counterPercent}%`;
+    if (elPlusTileSizeVal) elPlusTileSizeVal.textContent = `${plusPercent}%`;
+    if (elLabelCounterTileScale) elLabelCounterTileScale.textContent = `${counterPercent}%`;
+    if (elLabelPlusTileScale) elLabelPlusTileScale.textContent = `${plusPercent}%`;
+    if (elRangeCounterTileScale) elRangeCounterTileScale.value = counterPercent;
+    if (elRangePlusTileScale) elRangePlusTileScale.value = plusPercent;
+
+    if (customized) {
+      elViewSingle.classList.add('has-custom-tiles');
+      elViewSingle.style.setProperty('--counter-tile-x', `${counter.x}%`);
+      elViewSingle.style.setProperty('--counter-tile-y', `${counter.y}%`);
+      elViewSingle.style.setProperty('--plus-tile-x', `${plus.x}%`);
+      elViewSingle.style.setProperty('--plus-tile-y', `${plus.y}%`);
+    } else {
+      elViewSingle.classList.remove('has-custom-tiles');
+      elViewSingle.style.removeProperty('--counter-tile-x');
+      elViewSingle.style.removeProperty('--counter-tile-y');
+      elViewSingle.style.removeProperty('--plus-tile-x');
+      elViewSingle.style.removeProperty('--plus-tile-y');
+    }
+
+    updatePresetChipsActive();
+    updateBlindPresetChipsActive();
+    updateMiniPreview();
+  }
+
+  function updateMiniPreview() {
+    const elMiniCounter = document.getElementById('miniTileCounter');
+    const elMiniPlus = document.getElementById('miniTilePlus');
+    if (!elMiniCounter || !elMiniPlus || !state.tileLayout) return;
+
+    const { counter, plus, customized } = state.tileLayout;
+    if (customized) {
+      elMiniCounter.style.left = `${counter.x}%`;
+      elMiniCounter.style.top = `${counter.y}%`;
+      elMiniPlus.style.left = `${plus.x}%`;
+      elMiniPlus.style.top = `${plus.y}%`;
+    } else {
+      elMiniCounter.style.left = '50%';
+      elMiniCounter.style.top = '20%';
+      elMiniPlus.style.left = '50%';
+      elMiniPlus.style.top = '65%';
+    }
+  }
+
+  function updatePresetChipsActive() {
+    if (!elSettingsTilePresetsGrid) return;
+    const chips = elSettingsTilePresetsGrid.querySelectorAll('.tile-preset-chip');
+    chips.forEach(chip => {
+      const p = chip.dataset.preset;
+      let isActive = false;
+      if (!state.tileLayout.customized && p === 'default') {
+        isActive = true;
+      } else if (state.tileLayout.customized && state.tileLayout.preset === p) {
+        isActive = true;
+      }
+      chip.classList.toggle('active', isActive);
+    });
+
+    if (elTilesCustomizeToolbar) {
+      const toolbarChips = elTilesCustomizeToolbar.querySelectorAll('.toolbar-preset-btn');
+      toolbarChips.forEach(chip => {
+        const p = chip.dataset.preset;
+        let isActive = false;
+        if (!state.tileLayout.customized && p === 'default') {
+          isActive = true;
+        } else if (state.tileLayout.customized && state.tileLayout.preset === p) {
+          isActive = true;
+        }
+        chip.style.borderColor = isActive ? 'var(--color-accent)' : '';
+        chip.style.color = isActive ? 'var(--color-accent)' : '';
+        chip.style.fontWeight = isActive ? '700' : 'normal';
+      });
+    }
+  }
+
+  function updateBlindPresetChipsActive() {
+    if (!elSettingsBlindTilePresetsGrid) return;
+    const chips = elSettingsBlindTilePresetsGrid.querySelectorAll('.blind-preset-chip');
+    const bx = (state.tileLayout && state.tileLayout.blind && state.tileLayout.blind.x) || 50;
+    const by = (state.tileLayout && state.tileLayout.blind && state.tileLayout.blind.y) || 16;
+    chips.forEach(chip => {
+      const pos = chip.dataset.blindPos;
+      let active = false;
+      if (pos === 'top-center' && Math.abs(bx - 50) < 8 && Math.abs(by - 16) < 8) active = true;
+      else if (pos === 'top-right' && bx > 65 && by < 30) active = true;
+      else if (pos === 'bottom-center' && Math.abs(bx - 50) < 8 && by > 65) active = true;
+      else if (pos === 'bottom-right' && bx > 65 && by > 65) active = true;
+      chip.classList.toggle('active', active);
+    });
+  }
+
+  function enterTileCustomizeMode() {
+    if (state.mode !== 'single') {
+      state.mode = 'single';
+      renderAll();
+    }
+    closeModal(elDrawerSettings);
+    document.body.classList.add('is-customizing-tiles');
+    if (elTilesCustomizeToolbar) elTilesCustomizeToolbar.classList.remove('hidden');
+
+    // If not customized yet, set standard center coordinates as starting point
+    if (!state.tileLayout.customized) {
+      state.tileLayout.counter.x = 50;
+      state.tileLayout.counter.y = 22;
+      state.tileLayout.plus.x = 50;
+      state.tileLayout.plus.y = 65;
+      state.tileLayout.customized = true;
+      applyTileLayout();
+    }
+
+    showToast('Layout unlocked: drag tiles or adjust sizes');
+  }
+
+  function updateSettingsTitlePreview() {
+    if (elSettingsActiveTitlePreview) {
+      const active = getActiveCounter();
+      elSettingsActiveTitlePreview.textContent = `Current: ${active.name || '1. Araham'}`;
+    }
+  }
+
+  function exitTileCustomizeMode(save = true) {
+    document.body.classList.remove('is-customizing-tiles');
+    if (elTilesCustomizeToolbar) elTilesCustomizeToolbar.classList.add('hidden');
+    if (elBtnToggleCustomizeTiles) elBtnToggleCustomizeTiles.classList.add('hidden');
+    if (save) {
+      saveState();
+      showToast('Tile Layout Saved');
+    }
+  }
+
+  function resetTileLayout() {
+    state.tileLayout = {
+      customized: false,
+      counter: { x: 50, y: 20, scale: 1.0 },
+      plus: { x: 50, y: 65, scale: 1.0 },
+      blind: { x: 50, y: 16 },
+      preset: 'default'
+    };
+    applyTileLayout();
+    saveState();
+    if (elBtnToggleCustomizeTiles) elBtnToggleCustomizeTiles.classList.add('hidden');
+    showToast('All custom tile positions cleared & reset to center');
+  }
+
+  function applyTilePreset(presetName) {
+    if (presetName === 'default') {
+      resetTileLayout();
+      return;
+    }
+
+    state.tileLayout.customized = true;
+    state.tileLayout.preset = presetName;
+
+    if (presetName === 'buddha-gaze') {
+      // Moves counter card up and plus button down into water reflections
+      // Clears Buddha statue face, chest & meditation mudra
+      state.tileLayout.counter = { x: 50, y: 13, scale: 0.85 };
+      state.tileLayout.plus = { x: 50, y: 85, scale: 0.82 };
+    } else if (presetName === 'zen-clear') {
+      // Moves both tiles to the right margin, leaving center vertical axis 100% UNBLOCKED
+      state.tileLayout.counter = { x: 74, y: 13, scale: 0.82 };
+      state.tileLayout.plus = { x: 74, y: 82, scale: 0.85 };
+    } else if (presetName === 'right-thumb') {
+      // Positioned for easy one-hand right-thumb tapping
+      state.tileLayout.counter = { x: 36, y: 14, scale: 0.85 };
+      state.tileLayout.plus = { x: 75, y: 78, scale: 0.90 };
+    } else if (presetName === 'left-thumb') {
+      // Positioned for easy one-hand left-thumb tapping
+      state.tileLayout.counter = { x: 64, y: 14, scale: 0.85 };
+      state.tileLayout.plus = { x: 25, y: 78, scale: 0.90 };
+    }
+
+    applyTileLayout();
+    saveState();
+    showToast(`Preset applied: ${presetName}`);
+  }
+
+  function setupTileCustomization() {
+    const tiles = [
+      { el: elTileCounterCard, key: 'counter' },
+      { el: elTileIncrementor, key: 'plus' }
+    ];
+
+    tiles.forEach(({ el, key }) => {
+      if (!el) return;
+
+      let startX = 0, startY = 0;
+      let initialXPercent = 50, initialYPercent = 50;
+      let isDragging = false;
+      let longPressTimer = null;
+
+      // Pointer down
+      el.addEventListener('pointerdown', (e) => {
+        // If clicking on direct input, title rename button, or size stepper buttons, skip dragging
+        if (e.target.closest('input, .active-chant-title-btn, .btn-step-size')) {
+          return;
+        }
+
+        const isCustomizing = document.body.classList.contains('is-customizing-tiles');
+
+        if (!isCustomizing) {
+          // Detect long-press (600ms) to unlock tile customization mode smoothly
+          longPressTimer = setTimeout(() => {
+            triggerHaptic('medium');
+            enterTileCustomizeMode();
+          }, 600);
+          return;
+        }
+
+        // We ARE in customize mode: begin dragging this tile
+        e.preventDefault();
+        e.stopPropagation();
+
+        const viewRect = elViewSingle.getBoundingClientRect();
+        const tileRect = el.getBoundingClientRect();
+
+        const currentCenterX = (tileRect.left + tileRect.width / 2) - viewRect.left;
+        const currentCenterY = (tileRect.top + tileRect.height / 2) - viewRect.top;
+
+        initialXPercent = (currentCenterX / viewRect.width) * 100;
+        initialYPercent = (currentCenterY / viewRect.height) * 100;
+
+        startX = e.clientX;
+        startY = e.clientY;
+        isDragging = true;
+
+        el.classList.add('is-dragging');
+        try {
+          el.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      });
+
+      // Pointer move
+      el.addEventListener('pointermove', (e) => {
+        if (longPressTimer) {
+          // If moved more than 8px before long press fires, cancel it
+          if (Math.hypot(e.clientX - startX, e.clientY - startY) > 8) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+        }
+
+        if (!isDragging) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const viewRect = elViewSingle.getBoundingClientRect();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        let newX = initialXPercent + (dx / viewRect.width) * 100;
+        let newY = initialYPercent + (dy / viewRect.height) * 100;
+
+        // Boundaries clamp to prevent tile from leaving the viewport
+        newX = Math.max(14, Math.min(86, newX));
+        newY = Math.max(10, Math.min(90, newY));
+
+        state.tileLayout.customized = true;
+        delete state.tileLayout.preset; // Manual drag overrides preset
+        state.tileLayout[key].x = Math.round(newX * 10) / 10;
+        state.tileLayout[key].y = Math.round(newY * 10) / 10;
+
+        elViewSingle.classList.add('has-custom-tiles');
+        elViewSingle.style.setProperty(`--${key}-tile-x`, `${state.tileLayout[key].x}%`);
+        elViewSingle.style.setProperty(`--${key}-tile-y`, `${state.tileLayout[key].y}%`);
+      });
+
+      // Pointer up / cancel
+      const finishDrag = (e) => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        if (isDragging) {
+          isDragging = false;
+          el.classList.remove('is-dragging');
+          try {
+            el.releasePointerCapture(e.pointerId);
+          } catch (_) {}
+          saveState();
+        }
+      };
+
+      el.addEventListener('pointerup', finishDrag);
+      el.addEventListener('pointercancel', finishDrag);
+    });
+
+    // Stepper buttons (− / +) on tile handles
+    document.querySelectorAll('.btn-step-size').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tileKey = btn.dataset.tile; // 'counter' | 'plus'
+        const isPlus = btn.classList.contains('btn-size-plus');
+        const currentScale = state.tileLayout[tileKey].scale || 1.0;
+        let newScale = isPlus ? currentScale + 0.1 : currentScale - 0.1;
+        newScale = Math.max(0.65, Math.min(1.45, Math.round(newScale * 10) / 10));
+
+        state.tileLayout[tileKey].scale = newScale;
+        applyTileLayout();
+        saveState();
+        triggerHaptic('light');
+      });
+    });
+
+    // Toggle button in bottom controls
+    if (elBtnToggleCustomizeTiles) {
+      elBtnToggleCustomizeTiles.addEventListener('click', () => {
+        if (document.body.classList.contains('is-customizing-tiles')) {
+          exitTileCustomizeMode(true);
+        } else {
+          enterTileCustomizeMode();
+        }
+      });
+    }
+
+    // Launch button in settings drawer
+    if (elBtnLaunchTileCustomizer) {
+      elBtnLaunchTileCustomizer.addEventListener('click', () => {
+        enterTileCustomizeMode();
+      });
+    }
+
+    // Toolbar Reset & Done
+    if (elBtnResetTilePositions) {
+      elBtnResetTilePositions.addEventListener('click', resetTileLayout);
+    }
+    if (elBtnDoneTilePositions) {
+      elBtnDoneTilePositions.addEventListener('click', () => exitTileCustomizeMode(true));
+    }
+
+    // Presets in toolbar & settings
+    document.querySelectorAll('.toolbar-preset-btn, .tile-preset-chip').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const preset = e.currentTarget.dataset.preset;
+        if (preset) applyTilePreset(preset);
+      });
+    });
+
+    // Settings drawer reset
+    if (elBtnSettingsResetTiles) {
+      elBtnSettingsResetTiles.addEventListener('click', resetTileLayout);
+    }
+
+    // Settings drawer rename chant title
+    if (elBtnSettingsEditTitle) {
+      elBtnSettingsEditTitle.addEventListener('click', () => {
+        const active = getActiveCounter();
+        const newName = prompt('Enter name for this chant:', active.name);
+        if (newName !== null && newName.trim() !== '') {
+          active.name = newName.trim();
+          saveState();
+          renderAll();
+          updateSettingsTitlePreview();
+          showToast('Chant title updated');
+        }
+      });
+    }
+
+    // Blind tile presets in settings drawer
+    document.querySelectorAll('.blind-preset-chip').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const pos = e.currentTarget.dataset.blindPos;
+        if (!state.tileLayout.blind) state.tileLayout.blind = { x: 50, y: 16 };
+        if (pos === 'top-center') state.tileLayout.blind = { x: 50, y: 16 };
+        else if (pos === 'top-right') state.tileLayout.blind = { x: 78, y: 14 };
+        else if (pos === 'bottom-center') state.tileLayout.blind = { x: 50, y: 84 };
+        else if (pos === 'bottom-right') state.tileLayout.blind = { x: 78, y: 84 };
+        applyTileLayout();
+        saveState();
+        triggerHaptic('light');
+        showToast(`Blind tile: ${pos.replace('-', ' ')}`);
+      });
+    });
+
+    // Settings drawer scale sliders
+    if (elRangeCounterTileScale) {
+      elRangeCounterTileScale.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        state.tileLayout.counter.scale = val / 100;
+        applyTileLayout();
+      });
+      elRangeCounterTileScale.addEventListener('change', () => {
+        saveState();
+      });
+    }
+
+    if (elRangePlusTileScale) {
+      elRangePlusTileScale.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        state.tileLayout.plus.scale = val / 100;
+        applyTileLayout();
+      });
+      elRangePlusTileScale.addEventListener('change', () => {
+        saveState();
+      });
+    }
   }
 
   // --- Initialize App ---
   function init() {
     loadState();
     applyTheme(state.theme || 'gold');
+    applyBuddhaWallpaper();
     setupEventListeners();
     renderAll();
   }
